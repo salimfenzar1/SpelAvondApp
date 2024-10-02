@@ -34,5 +34,5 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'bordspelavond'  # Vul hier de naam van je Azure Web App in
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}  # Dit komt van je Azure Web App
-        package: ./publish
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_DB881BEC0F3E436B89313302765D2C32 }}
+        package: .
