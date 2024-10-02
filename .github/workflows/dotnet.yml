@@ -16,7 +16,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '8.x'  # Zorg ervoor dat dit overeenkomt met de .NET versie van je project
+        dotnet-version: '8.x' 
 
     - name: Install dependencies
       run: dotnet restore
@@ -33,6 +33,6 @@ jobs:
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'bordspel'  # Vul hier de naam van je Azure Web App in
+        app-name: 'bordspelavond'  
         publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_DB881BEC0F3E436B89313302765D2C32 }}
         package: .
