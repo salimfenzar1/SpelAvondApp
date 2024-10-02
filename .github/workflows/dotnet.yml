@@ -33,6 +33,6 @@ jobs:
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'bordspelavond'  # Vul hier de naam van je Azure Web App in
+        app-name: 'bordspel'  # Vul hier de naam van je Azure Web App in
         publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_DB881BEC0F3E436B89313302765D2C32 }}
         package: .
