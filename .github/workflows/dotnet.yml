@@ -29,17 +29,10 @@ jobs:
 
     - name: Publish project
       run: dotnet publish --configuration Release --no-restore --output ./publish
-
-    - name: Login to Azure
-      uses: azure/login@v1
-      with:
-          client-id: 43695550-9ccb-452b-8d42-f932fb945df0 
-          tenant-id: 87c50b58-2ef2-423d-a4db-1fa7c84efcfa 
-          subscription-id: 8f1b58ac-dd10-41ff-b45c-65bec346f469 
-          client-secret: mVy8Q~iBcev859aXVQQHai2c7S6qkYeB9pl4-bhl
           
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'bordspelavond'  
+        app-name: 'bordspelavond' 
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
         package: .
