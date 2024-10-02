@@ -33,14 +33,13 @@ jobs:
     - name: Login to Azure
       uses: azure/login@v1
       with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_43695550-9ccb-452b-8d42-f932fb945df0 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_87c50b58-2ef2-423d-a4db-1fa7c84efcfa }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8f1b58ac-dd10-41ff-b45c-65bec346f469 }}
-          client-secret: ${{ secrets.AZURE_CREDENTIALS_SECRET_mVy8Q~iBcev859aXVQQHai2c7S6qkYeB9pl4-bhl }} 
+          client-id: 43695550-9ccb-452b-8d42-f932fb945df0 
+          tenant-id: 87c50b58-2ef2-423d-a4db-1fa7c84efcfa 
+          subscription-id: 8f1b58ac-dd10-41ff-b45c-65bec346f469 
+          client-secret: mVy8Q~iBcev859aXVQQHai2c7S6qkYeB9pl4-bhl
           
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
         app-name: 'bordspelavond'  
-        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_DB881BEC0F3E436B89313302765D2C32 }}
         package: .
