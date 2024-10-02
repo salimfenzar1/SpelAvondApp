@@ -1,0 +1,38 @@
+name: Build and Deploy ASP.NET Core to Azure Web App
+
+on:
+  push:
+    branches:
+      - master  # Of de branch die je wilt gebruiken voor deployment
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.x'  # Zorg ervoor dat dit overeenkomt met de .NET versie van je project
+
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Build the project
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Run tests
+      run: dotnet test --no-restore --verbosity normal
+
+    - name: Publish project
+      run: dotnet publish --configuration Release --no-restore --output ./publish
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'bordspelavond'  # Vul hier de naam van je Azure Web App in
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}  # Dit komt van je Azure Web App
+        package: ./publish
