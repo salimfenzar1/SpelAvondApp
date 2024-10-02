@@ -30,6 +30,13 @@ jobs:
     - name: Publish project
       run: dotnet publish --configuration Release --no-restore --output ./publish
 
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_78E7E83FA31945D89D35DD2390AC8158 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_16C5E2C4DE5F446C95AC2CBD050CB65C }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_94DFE0AAA7A54EAFACB1F4F45DF49E28 }}   
+
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
