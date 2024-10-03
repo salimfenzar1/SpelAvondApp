@@ -36,11 +36,49 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // Identity configureren
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+    await SeedRolesAndAdminUser(roleManager, userManager);
+}
+
+// Methode om rollen en een admin-gebruiker te seeden
+async Task SeedRolesAndAdminUser(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
+{
+    // Check of de Administrator rol bestaat, zo niet, maak hem aan
+    if (!await roleManager.RoleExistsAsync("Administrator"))
+    {
+        await roleManager.CreateAsync(new IdentityRole("Administrator"));
+    }
+
+    // Voeg een admin-gebruiker toe als deze nog niet bestaat
+    var adminUser = await userManager.FindByEmailAsync("admin@example.com");
+    if (adminUser == null)
+    {
+        var user = new IdentityUser
+        {
+            UserName = "admin@example.com",
+            Email = "admin@example.com",
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(user, "AdminPassword123!"); 
+        if (result.Succeeded)
+        {
+            // Ken de rol Administrator toe aan de gebruiker
+            await userManager.AddToRoleAsync(user, "Administrator");
+        }
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (isDevelopment)
