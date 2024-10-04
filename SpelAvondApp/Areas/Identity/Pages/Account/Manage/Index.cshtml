@@ -1,0 +1,79 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Profile";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<h3>@ViewData["Title"]</h3>
+<partial name="_StatusMessage" for="StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <form id="profile-form" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+            <!-- Gebruikersnaam (alleen lezen) -->
+            <div class="form-floating mb-3">
+                <input asp-for="Username" class="form-control" placeholder="Username" disabled />
+                <label asp-for="Username" class="form-label">Username</label>
+            </div>
+
+            <!-- Naam -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Naam" class="form-control" placeholder="Naam" />
+                <label asp-for="Input.Naam" class="form-label">Naam</label>
+                <span asp-validation-for="Input.Naam" class="text-danger"></span>
+            </div>
+
+            <!-- Geslacht -->
+            <div class="form-floating mb-3">
+                <select asp-for="Input.Geslacht" class="form-select">
+                    <option value="M">Man</option>
+                    <option value="V">Vrouw</option>
+                    <option value="X">Overig</option>
+                </select>
+                <label asp-for="Input.Geslacht">Geslacht</label>
+                <span asp-validation-for="Input.Geslacht" class="text-danger"></span>
+            </div>
+
+            <!-- Straat -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Straat" class="form-control" placeholder="Straat" />
+                <label asp-for="Input.Straat" class="form-label">Straat</label>
+                <span asp-validation-for="Input.Straat" class="text-danger"></span>
+            </div>
+
+            <!-- Huisnummer -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Huisnummer" class="form-control" placeholder="Huisnummer" />
+                <label asp-for="Input.Huisnummer" class="form-label">Huisnummer</label>
+                <span asp-validation-for="Input.Huisnummer" class="text-danger"></span>
+            </div>
+
+            <!-- Stad -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Stad" class="form-control" placeholder="Stad" />
+                <label asp-for="Input.Stad" class="form-label">Stad</label>
+                <span asp-validation-for="Input.Stad" class="text-danger"></span>
+            </div>
+
+            <!-- Geboortedatum -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Geboortedatum" type="date" class="form-control" placeholder="Geboortedatum"
+                       max="@DateTime.Now.ToString("yyyy-MM-dd")"
+                         aria-required="true" />
+                <label asp-for="Input.Geboortedatum">Geboortedatum</label>
+                <span asp-validation-for="Input.Geboortedatum" class="text-danger"></span>
+            </div>
+
+
+
+            <!-- Opslaan-knop -->
+            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

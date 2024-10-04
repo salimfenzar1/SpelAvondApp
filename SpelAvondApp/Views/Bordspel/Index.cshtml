@@ -1,0 +1,38 @@
+﻿@model IEnumerable<SpelAvondApp.Domain.Models.Bordspel>
+
+@{
+    ViewData["Title"] = "Alle Bordspellen";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<a asp-controller="Bordspel" asp-action="CreateBordspel" class="btn btn-success mb-3">Bordspel Aanmaken</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Naam</th>
+            <th>Beschrijving</th>
+            <th>Genre</th>
+            <th>Soort Spel</th>
+            <th>18+</th>
+            <th>Acties</th> <!-- Nieuwe kolom voor acties -->
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var bordspel in Model)
+        {
+            <tr>
+                <td>@bordspel.Naam</td>
+                <td>@bordspel.Beschrijving</td>
+                <td>@bordspel.Genre</td>
+                <td>@bordspel.SoortSpel</td>
+                <td>@bordspel.Is18Plus</td>
+                <td>
+                    <a asp-controller="Bordspel" asp-action="EditBordspel" asp-route-id="@bordspel.Id" class="btn btn-primary btn-sm">Bewerken</a>
+                    <a asp-controller="Bordspel" asp-action="DeleteBordspel" asp-route-id="@bordspel.Id" class="btn btn-danger btn-sm">Verwijderen</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

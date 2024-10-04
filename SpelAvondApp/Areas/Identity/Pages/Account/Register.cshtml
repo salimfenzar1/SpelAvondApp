@@ -1,0 +1,91 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <!-- Vergroot de breedte op medium en large schermen -->
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <h2 class="text-center">Create a new account.</h2> <!-- Centreer de header -->
+            <hr />
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+            <!-- Naam -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Naam" class="form-control" placeholder="Naam" aria-required="true" />
+                <label asp-for="Input.Naam">Naam</label>
+                <span asp-validation-for="Input.Naam" class="text-danger"></span>
+            </div>
+
+            <!-- Geslacht -->
+            <div class="form-floating mb-3">
+                <select asp-for="Input.Geslacht" class="form-select" aria-required="true">
+                    <option value="M">Man</option>
+                    <option value="V">Vrouw</option>
+                    <option value="X">Overig</option>
+                </select>
+                <label asp-for="Input.Geslacht">Geslacht</label>
+                <span asp-validation-for="Input.Geslacht" class="text-danger"></span>
+            </div>
+
+            <!-- Straat -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Straat" class="form-control" placeholder="Straat" aria-required="true" />
+                <label asp-for="Input.Straat">Straat</label>
+                <span asp-validation-for="Input.Straat" class="text-danger"></span>
+            </div>
+
+            <!-- Huisnummer -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Huisnummer" class="form-control" placeholder="Huisnummer" aria-required="true" />
+                <label asp-for="Input.Huisnummer">Huisnummer</label>
+                <span asp-validation-for="Input.Huisnummer" class="text-danger"></span>
+            </div>
+
+            <!-- Stad -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Stad" class="form-control" placeholder="Stad" aria-required="true" />
+                <label asp-for="Input.Stad">Stad</label>
+                <span asp-validation-for="Input.Stad" class="text-danger"></span>
+            </div>
+
+            <!-- Geboortedatum -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Geboortedatum" type="date" class="form-control" placeholder="Geboortedatum" aria-required="true" />
+                <label asp-for="Input.Geboortedatum">Geboortedatum</label>
+                <span asp-validation-for="Input.Geboortedatum" class="text-danger"></span>
+            </div>
+
+            <!-- Email -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <label asp-for="Input.Email">Email</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <!-- Wachtwoord -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                <label asp-for="Input.Password">Password</label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <!-- Bevestig wachtwoord -->
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

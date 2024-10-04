@@ -1,0 +1,53 @@
+﻿@using SpelAvondApp.Domain.Models
+@model SpelAvondApp.Domain.Models.Bordspel
+
+
+@{
+    ViewData["Title"] = "Nieuw Bordspel";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="CreateBordspel" method="post">
+    <div class="form-group">
+        <label asp-for="Naam" class="form-label"></label>
+        <input asp-for="Naam" class="form-control" />
+        <span asp-validation-for="Naam" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Beschrijving" class="form-label"></label>
+        <textarea asp-for="Beschrijving" class="form-control"></textarea>
+        <span asp-validation-for="Beschrijving" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Genre"></label>
+        <select asp-for="Genre" class="form-control">
+            @foreach (var genre in Enum.GetValues(typeof(Genre)))
+            {
+                <option value="@genre">@genre</option>
+            }
+        </select>
+        <span asp-validation-for="Genre" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SoortSpel"></label>
+        <select asp-for="SoortSpel" class="form-control">
+            @foreach (var soort in Enum.GetValues(typeof(SoortSpel)))
+            {
+                <option value="@soort">@soort</option>
+            }
+        </select>
+        <span asp-validation-for="SoortSpel" class="text-danger"></span>
+    </div>
+    <div class="form-check mb-3">
+        <input asp-for="Is18Plus" class="form-check-input" type="checkbox" id="is18Plus" />
+        <label asp-for="Is18Plus" class="form-check-label" for="is18Plus">Is 18+</label>
+        <span asp-validation-for="Is18Plus" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Opslaan</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
