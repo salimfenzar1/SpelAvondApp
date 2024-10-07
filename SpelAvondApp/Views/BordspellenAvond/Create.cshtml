@@ -1,0 +1,54 @@
+﻿@model SpelAvondApp.Domain.Models.BordspellenAvond
+@{
+    ViewData["Title"] = "Nieuwe Bordspellenavond Aanmaken";
+    var beschikbareBordspellen = ViewBag.Bordspellen as List<SpelAvondApp.Domain.Models.Bordspel>;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Datum">Datum en Tijd</label>
+        <input asp-for="Datum" class="form-control" type="datetime-local" />
+        <span asp-validation-for="Datum" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Adres">Adres</label>
+        <input asp-for="Adres" class="form-control" />
+        <span asp-validation-for="Adres" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="MaxAantalSpelers">Maximaal Aantal Spelers</label>
+        <input asp-for="MaxAantalSpelers" class="form-control" type="number" />
+        <span asp-validation-for="MaxAantalSpelers" class="text-danger"></span>
+    </div>
+    <div class="form-check mb-3">
+        <input asp-for="Is18Plus" class="form-check-input" type="checkbox" />
+        <label asp-for="Is18Plus" class="form-check-label">Alleen voor 18+</label>
+        <span asp-validation-for="Is18Plus" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="geselecteerdeBordspellen">Kies Bordspellen</label>
+
+        @if (beschikbareBordspellen != null && beschikbareBordspellen.Any())
+        {
+            <select multiple class="form-control" name="geselecteerdeBordspellen" id="geselecteerdeBordspellen">
+                @foreach (var bordspel in beschikbareBordspellen)
+                {
+                    <option value="@bordspel.Id">@bordspel.Naam</option>
+                }
+            </select>
+        }
+        else
+        {
+            <p class="text-warning">Er zijn geen bordspellen beschikbaar om te selecteren.</p>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary">Opslaan</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

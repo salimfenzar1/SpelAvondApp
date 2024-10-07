@@ -18,7 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
-using SpelAvondApp.Data;
+using SpelAvondApp.Domain.Models;
 
 namespace SpelAvondApp.Areas.Identity.Pages.Account
 {

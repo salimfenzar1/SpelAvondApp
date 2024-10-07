@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace SpelAvondApp.Data
+namespace SpelAvondApp.Domain.Models
 {
     public class ApplicationUser : IdentityUser
     {
@@ -30,7 +30,7 @@ namespace SpelAvondApp.Data
         {
             get
             {
-                return (DateTime.Now.Year - Geboortedatum.Year) >= 18;
+                return DateTime.Now.Year - Geboortedatum.Year >= 18;
             }
         }
     }

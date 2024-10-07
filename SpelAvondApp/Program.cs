@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SpelAvondApp.Data;
+using SpelAvondApp.Domain.Models;
 using SpelAvondApp.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +32,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Configureer de spellen-database met SpellenDbContext
 builder.Services.AddDbContext<SpellenDbContext>(options =>
     options.UseSqlServer(spellenDbConnectionString));
+
+builder.Services.AddScoped<IBordspelService, BordspelService>();
+builder.Services.AddScoped<ISpellenRepository, SpellenRepository>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 

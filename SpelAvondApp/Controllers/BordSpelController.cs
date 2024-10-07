@@ -1,22 +1,25 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SpelAvondApp.Data;
-using SpelAvondApp.Infrastructure;
 using SpelAvondApp.Domain.Models;
-using Microsoft.AspNetCore.Authorization;
-using System.Linq;
 using System.Threading.Tasks;
 
 [Authorize]
 public class BordspelController : Controller
 {
+    private readonly IBordspelService _bordspelService;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly SpellenDbContext _context;
 
-    public BordspelController(UserManager<ApplicationUser> userManager, SpellenDbContext context)
+    public BordspelController(IBordspelService bordspelService, UserManager<ApplicationUser> userManager)
     {
+        _bordspelService = bordspelService;
         _userManager = userManager;
-        _context = context;
+    }
+
+    public async Task<IActionResult> Index()
+    {
+        var bordspellen = await _bordspelService.GetAllBordspellenAsync();
+        return View(bordspellen);
     }
 
     public IActionResult CreateBordspel()
@@ -28,35 +31,23 @@ public class BordspelController : Controller
     public async Task<IActionResult> CreateBordspel(Bordspel model)
     {
         var user = await _userManager.GetUserAsync(User);
-        var today = DateTime.Today;
-        var age = today.Year - user.Geboortedatum.Year;
-        if (user.Geboortedatum.Date > today.AddYears(-age)) age--;
-
-        if (age < 18)
+        if (!await _bordspelService.IsUserEligibleToCreateBordspel(user))
         {
             return BadRequest("Je moet minimaal 18 jaar oud zijn om een bordspel aan te maken.");
         }
 
         if (ModelState.IsValid)
         {
-            _context.Bordspellen.Add(model);
-            await _context.SaveChangesAsync();
+            await _bordspelService.AddBordspelAsync(model);
             return RedirectToAction(nameof(Index));
         }
 
         return View(model);
     }
 
- 
-    public IActionResult Index()
+    public async Task<IActionResult> EditBordspel(int id)
     {
-        var bordspellen = _context.Bordspellen.ToList();
-        return View(bordspellen);
-    }
-
-    public IActionResult EditBordspel(int id)
-    {
-        var bordspel = _context.Bordspellen.FirstOrDefault(b => b.Id == id);
+        var bordspel = await _bordspelService.GetBordspelByIdAsync(id);
         if (bordspel == null)
         {
             return NotFound();
@@ -69,29 +60,16 @@ public class BordspelController : Controller
     {
         if (ModelState.IsValid)
         {
-            var existingBordspel = _context.Bordspellen.FirstOrDefault(b => b.Id == model.Id);
-            if (existingBordspel == null)
-            {
-                return NotFound();
-            }
-
-            existingBordspel.Naam = model.Naam;
-            existingBordspel.Beschrijving = model.Beschrijving;
-            existingBordspel.Genre = model.Genre;
-            existingBordspel.Is18Plus = model.Is18Plus;
-            existingBordspel.SoortSpel = model.SoortSpel;
-
-            _context.Bordspellen.Update(existingBordspel);
-            await _context.SaveChangesAsync();
+            await _bordspelService.UpdateBordspelAsync(model);
             return RedirectToAction(nameof(Index));
         }
 
         return View(model);
     }
 
-    public IActionResult DeleteBordspel(int id)
+    public async Task<IActionResult> DeleteBordspel(int id)
     {
-        var bordspel = _context.Bordspellen.FirstOrDefault(b => b.Id == id);
+        var bordspel = await _bordspelService.GetBordspelByIdAsync(id);
         if (bordspel == null)
         {
             return NotFound();
@@ -102,14 +80,7 @@ public class BordspelController : Controller
     [HttpPost, ActionName("DeleteBordspel")]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var bordspel = _context.Bordspellen.FirstOrDefault(b => b.Id == id);
-        if (bordspel == null)
-        {
-            return NotFound();
-        }
-
-        _context.Bordspellen.Remove(bordspel);
-        await _context.SaveChangesAsync();
+        await _bordspelService.DeleteBordspelAsync(id);
         return RedirectToAction(nameof(Index));
     }
 }
