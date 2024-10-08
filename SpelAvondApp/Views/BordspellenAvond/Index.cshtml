@@ -15,7 +15,8 @@
             <th>Organisator</th>
             <th>Max Spelers</th>
             <th>18+</th>
-            <th>Bordspellen</th>
+            <th>Bordspellen</th> 
+            <th>Acties</th> 
         </tr>
     </thead>
     <tbody>
@@ -24,9 +25,9 @@
             <tr>
                 <td>@avond.Datum.ToString("dd-MM-yyyy HH:mm")</td>
                 <td>@avond.Adres</td>
-                <td>@avond.Organisator?.UserName ?? "Onbekend"</td>
+                <td>@avond.Organisator?.UserName</td>
                 <td>@avond.MaxAantalSpelers</td>
-                <td>@(avond.Is18Plus ? "Ja" : "Nee")</td>
+                <td>@(avond.Is18Plus )</td>
                 <td>
                     @if (avond.Bordspellen != null && avond.Bordspellen.Any())
                     {
@@ -39,8 +40,13 @@
                     }
                     else
                     {
-                        <span>Geen bordspellen toegevoegd</span>
+                        <span>Geen bordspellen geselecteerd</span>
                     }
+                </td>
+                <td>
+                    <!-- Acties kolom -->
+                    <a asp-controller="BordspellenAvond" asp-action="Edit" asp-route-id="@avond.Id" class="btn btn-primary btn-sm">Bewerken</a>
+                    <a asp-controller="BordspellenAvond" asp-action="Delete" asp-route-id="@avond.Id" class="btn btn-danger btn-sm">Verwijderen</a>
                 </td>
             </tr>
         }

@@ -1,37 +1,33 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SpelAvondApp.Domain.Models;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using SpelAvondApp.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 
 [Authorize]
 public class BordspellenAvondController : Controller
 {
+    private readonly IBordspellenAvondService _bordspellenAvondService;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly SpellenDbContext _context;
 
-    public BordspellenAvondController(UserManager<ApplicationUser> userManager, SpellenDbContext context)
+    public BordspellenAvondController(IBordspellenAvondService bordspellenAvondService, UserManager<ApplicationUser> userManager)
     {
+        _bordspellenAvondService = bordspellenAvondService;
         _userManager = userManager;
-        _context = context;
     }
 
-        public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index()
     {
-        var avonden = await _context.BordspellenAvonden
-            .Include(b => b.Organisator)
-            .Include(b => b.Bordspellen)
-            .ToListAsync();
+        var avonden = await _bordspellenAvondService.GetAllAvondenAsync();
         return View(avonden);
     }
 
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
-        var bordspellen = _context.Bordspellen.ToList();
-        ViewBag.Bordspellen = bordspellen; // Stuur de bordspellen mee naar de view
+        var bordspellen = await _bordspellenAvondService.GetAllBordspellenAsync();
+        ViewBag.Bordspellen = new MultiSelectList(bordspellen, "Id", "Naam");
         return View();
     }
 
@@ -40,34 +36,85 @@ public class BordspellenAvondController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
 
-        // Leeftijdscontrole
-        var today = DateTime.Today;
-        var age = today.Year - user.Geboortedatum.Year;
-        if (user.Geboortedatum.Date > today.AddYears(-age)) age--;
-
-        if (age < 18)
+        if (!await _bordspellenAvondService.IsUserEligibleToOrganizeAsync(user))
         {
             return BadRequest("Je moet minimaal 18 jaar oud zijn om een bordspellenavond te organiseren.");
         }
 
+        model.OrganisatorId = user.Id;
+        if (ModelState.ContainsKey("Organisator"))
+            ModelState.Remove("Organisator");
+
         if (ModelState.IsValid)
         {
-            model.OrganisatorId = user.Id;
-
-            // Voeg de geselecteerde bordspellen toe aan de avond
-            model.Bordspellen = _context.Bordspellen
-                .Where(b => geselecteerdeBordspellen.Contains(b.Id))
-                .ToList();
-
-            _context.BordspellenAvonden.Add(model);
-            await _context.SaveChangesAsync();
+            await _bordspellenAvondService.CreateBordspellenAvondAsync(model, geselecteerdeBordspellen, user.Id);
             return RedirectToAction(nameof(Index));
         }
 
-        var bordspellen = _context.Bordspellen.ToList();
-        ViewBag.Bordspellen = bordspellen;
+        var bordspellen = await _bordspellenAvondService.GetAllBordspellenAsync();
+        ViewBag.Bordspellen = new MultiSelectList(bordspellen, "Id", "Naam");
         return View(model);
     }
 
+    public async Task<IActionResult> Edit(int id)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (!await _bordspellenAvondService.UserCanEditOrDeleteAsync(id, user.Id))
+        {
+            return Forbid();
+        }
 
+        var avond = await _bordspellenAvondService.GetAvondByIdAsync(id);
+        var bordspellen = await _bordspellenAvondService.GetAllBordspellenAsync();
+        ViewBag.Bordspellen = new MultiSelectList(bordspellen, "Id", "Naam", avond.Bordspellen.Select(b => b.Id));
+
+        return View(avond);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Edit(BordspellenAvond model, List<int> geselecteerdeBordspellen)
+    {
+        var user = await _userManager.GetUserAsync(User);
+
+        if (!await _bordspellenAvondService.UserCanEditOrDeleteAsync(model.Id, user.Id))
+        {
+            return Forbid();
+        }
+
+        if (ModelState.IsValid)
+        {
+            await _bordspellenAvondService.UpdateBordspellenAvondAsync(model, geselecteerdeBordspellen);
+            return RedirectToAction(nameof(Index));
+        }
+
+        var bordspellen = await _bordspellenAvondService.GetAllBordspellenAsync();
+        ViewBag.Bordspellen = new MultiSelectList(bordspellen, "Id", "Naam", geselecteerdeBordspellen);
+
+        return View(model);
+    }
+
+    public async Task<IActionResult> Delete(int id)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (!await _bordspellenAvondService.UserCanEditOrDeleteAsync(id, user.Id))
+        {
+            return Forbid();
+        }
+
+        var avond = await _bordspellenAvondService.GetAvondByIdAsync(id);
+        return View(avond);
+    }
+
+    [HttpPost, ActionName("Delete")]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (!await _bordspellenAvondService.UserCanEditOrDeleteAsync(id, user.Id))
+        {
+            return Forbid();
+        }
+
+        await _bordspellenAvondService.DeleteBordspellenAvondAsync(id);
+        return RedirectToAction(nameof(Index));
+    }
 }

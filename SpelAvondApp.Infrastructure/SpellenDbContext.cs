@@ -20,11 +20,13 @@ namespace SpelAvondApp.Infrastructure
         {
             base.OnModelCreating(modelBuilder);
 
-            // Veel-op-veel relatie tussen BordspellenAvond en Bordspel
+            // Een-op-veel relatie tussen BordspellenAvond en Bordspel
             modelBuilder.Entity<BordspellenAvond>()
-                .HasMany(b => b.Bordspellen)
-                .WithMany(s => s.BordspellenAvonden)
-                .UsingEntity(j => j.ToTable("BordspellenAvondBordspellen"));
+       .HasMany(b => b.Bordspellen)
+       .WithMany(s => s.BordspellenAvonden)
+       .UsingEntity(j => j.ToTable("BordspellenAvondBordspellen"));
+
+     
 
             // Eén-op-veel relatie tussen BordspellenAvond en Inschrijving
             modelBuilder.Entity<BordspellenAvond>()

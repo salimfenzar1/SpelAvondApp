@@ -35,6 +35,8 @@ builder.Services.AddDbContext<SpellenDbContext>(options =>
 
 builder.Services.AddScoped<IBordspelService, BordspelService>();
 builder.Services.AddScoped<ISpellenRepository, SpellenRepository>();
+builder.Services.AddScoped<IBordspellenAvondService, BordspellenAvondService>();
+
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 

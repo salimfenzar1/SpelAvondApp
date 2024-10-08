@@ -13,7 +13,7 @@
     <p>@Model.Beschrijving</p>
     <p><strong>Genre:</strong> @Model.Genre</p>
     <p><strong>Soort Spel:</strong> @Model.SoortSpel</p>
-    <p><strong>18+:</strong> @(Model.Is18Plus ? "Ja" : "Nee")</p>
+    <p><strong>18+:</strong> @(Model.Is18Plus)</p>
 </div>
 
 <form asp-action="DeleteBordspel" method="post">
