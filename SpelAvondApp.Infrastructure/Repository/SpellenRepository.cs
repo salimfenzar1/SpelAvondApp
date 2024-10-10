@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SpelAvondApp.Domain.Models;
 using SpelAvondApp.Infrastructure;
 using System.Collections.Generic;
@@ -8,10 +9,13 @@ using System.Threading.Tasks;
 public class SpellenRepository : ISpellenRepository
 {
     private readonly SpellenDbContext _context;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public SpellenRepository(SpellenDbContext context)
+
+    public SpellenRepository(SpellenDbContext context, UserManager<ApplicationUser> userManager)
     {
         _context = context;
+        _userManager = userManager;
     }
 
     // Bordspel Methods
@@ -101,6 +105,7 @@ public class SpellenRepository : ISpellenRepository
         return await _context.BordspellenAvonden
             .AsNoTracking()
             .Include(b => b.Bordspellen) // Include de lijst van bordspellen
+            .Include(a => a.Inschrijvingen)
             .FirstOrDefaultAsync(a => a.Id == id);
     }
 
@@ -111,4 +116,41 @@ public class SpellenRepository : ISpellenRepository
             .AsNoTracking()
             .ToListAsync();
     }
+
+    public async Task AddInschrijvingAsync(Inschrijving inschrijving)
+    {
+        _context.Inschrijvingen.Add(inschrijving);
+        await _context.SaveChangesAsync();
+    }
+    public async Task<Inschrijving> GetInschrijvingAsync(string userId, int avondId)
+    {
+        return await _context.Inschrijvingen
+            .FirstOrDefaultAsync(i => i.SpelerId == userId && i.BordspellenAvondId == avondId);
+    }
+
+    public async Task<BordspellenAvond> GetAvondWithInschrijvingenAsync(int id)
+    {
+        var avond = await _context.BordspellenAvonden
+            .Include(a => a.Inschrijvingen)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
+        if (avond != null)
+        {
+            foreach (var inschrijving in avond.Inschrijvingen)
+            {
+                inschrijving.Speler = await _userManager.FindByIdAsync(inschrijving.SpelerId);
+            }
+        }
+
+        return avond;
+    }
+
+    public async Task<List<BordspellenAvond>> GetAvondenByOrganisatorAsync(string organisatorId)
+    {
+        return await _context.BordspellenAvonden
+            .Where(a => a.OrganisatorId == organisatorId)
+            .Include(a => a.Inschrijvingen)
+            .ToListAsync();
+    }
+
 }

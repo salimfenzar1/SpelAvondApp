@@ -5,10 +5,26 @@
 @{
     ViewData["Title"] = "Bordspellenavonden Overzicht";
     var currentUserId = UserManager.GetUserId(User);
+    var successMessage = TempData["SuccessMessage"] as string;
+    var errorMessage = TempData["ErrorMessage"] as string;
 }
 
 <h1>@ViewData["Title"]</h1>
 <a asp-controller="BordspellenAvond" asp-action="Create" class="btn btn-success mb-3">Bordspel Avond Aanmaken</a>
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success" role="alert">
+        @successMessage
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+}
 
 <table class="table table-striped">
     <thead>
@@ -55,9 +71,7 @@
                     }
                     else
                     {
-
                             <a asp-controller="Inschrijvingen" asp-action="Inschrijven" asp-route-avondId="@avond.Id" class="btn btn-success btn-sm">Inschrijven</a>
-                        
                     }
                 </td>
             </tr>

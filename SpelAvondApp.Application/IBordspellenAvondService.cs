@@ -19,4 +19,7 @@ public interface IBordspellenAvondService
 
     // Voeg deze methode toe om een bordspel op ID op te halen
     Task<Bordspel> GetBordspelByIdAsync(int id);
+    Task<BordspellenAvond> GetAvondWithInschrijvingenAsync(int id);
+
+    Task<List<BordspellenAvond>> GetAvondenByOrganisatorAsync(string organisatorId);
 }

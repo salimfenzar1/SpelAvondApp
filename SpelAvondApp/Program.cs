@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SpelAvondApp.Application;
 using SpelAvondApp.Data;
 using SpelAvondApp.Domain.Models;
 using SpelAvondApp.Infrastructure;
@@ -42,6 +43,8 @@ builder.Services.AddDefaultIdentity<ApplicationUser>()
 builder.Services.AddScoped<IBordspelService, BordspelService>();
 builder.Services.AddScoped<ISpellenRepository, SpellenRepository>();
 builder.Services.AddScoped<IBordspellenAvondService, BordspellenAvondService>();
+builder.Services.AddScoped<IInschrijvingService, InschrijvingService>();
+
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllersWithViews();

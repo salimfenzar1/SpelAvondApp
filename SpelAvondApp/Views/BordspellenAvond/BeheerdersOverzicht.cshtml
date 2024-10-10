@@ -1,0 +1,32 @@
+﻿@model List<SpelAvondApp.Domain.Models.BordspellenAvond>
+
+<h2>Beheerders Overzicht</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Datum</th>
+            <th>Adres</th>
+            <th>Max Aantal Spelers</th>
+            <th>Ingeschreven personen</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var avond in Model)
+        {
+            <tr>
+                <td>@avond.Datum.ToString("dd-MM-yyyy HH:mm")</td>
+                <td>@avond.Adres</td>
+                <td>@avond.MaxAantalSpelers</td>
+                <td>
+                    <ul>
+                        @foreach (var inschrijving in avond.Inschrijvingen)
+                        {
+                            <li>@inschrijving.Speler?.UserName</li>
+                        }
+                    </ul>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
