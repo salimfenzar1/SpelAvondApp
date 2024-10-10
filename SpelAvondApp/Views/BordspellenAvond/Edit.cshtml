@@ -29,8 +29,9 @@
     </div>
 
     <div class="form-group">
-        <label for="GeselecteerdeBordspellen">Kies Bordspellen</label>
-        <select asp-for="Bordspellen" asp-items="ViewBag.Bordspellen" class="form-control" multiple="multiple"></select>
+        <label for="geselecteerdeBordspellen">Kies Bordspellen</label>
+        <select asp-for="Bordspellen" asp-items="ViewBag.Bordspellen" class="form-control" multiple="multiple" name="geselecteerdeBordspellen">
+        </select>
         <span asp-validation-for="Bordspellen" class="text-danger"></span>
     </div>
 

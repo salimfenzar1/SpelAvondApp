@@ -67,13 +67,14 @@ public class SpellenRepository : ISpellenRepository
 
         if (bestaandeAvond != null)
         {
-            // Update de overige eigenschappen van de avond
+            // Update de eigenschappen van de avond
             bestaandeAvond.Datum = avond.Datum;
             bestaandeAvond.Adres = avond.Adres;
             bestaandeAvond.MaxAantalSpelers = avond.MaxAantalSpelers;
             bestaandeAvond.Is18Plus = avond.Is18Plus;
+            bestaandeAvond.OrganisatorId = avond.OrganisatorId;
 
-            // Verwijder bestaande bordspellen en voeg de nieuwe toe
+            // Update bordspellen voor de avond
             bestaandeAvond.Bordspellen.Clear();
             var nieuweBordspellen = await GetBordspellenByIdsAsync(avond.Bordspellen.Select(b => b.Id).ToList());
             foreach (var bordspel in nieuweBordspellen)
@@ -99,19 +100,15 @@ public class SpellenRepository : ISpellenRepository
     {
         return await _context.BordspellenAvonden
             .AsNoTracking()
-            .Include(b => b.Organisator)
-            .Include(b => b.Bordspellen) // Gebruik meervoud voor de lijst van bordspellen
+            .Include(b => b.Bordspellen) // Include de lijst van bordspellen
             .FirstOrDefaultAsync(a => a.Id == id);
     }
 
     public async Task<List<BordspellenAvond>> GetAllBordspellenAvondenAsync()
     {
         return await _context.BordspellenAvonden
-            .Include(b => b.Bordspellen) // Include the Bordspellen relation
-            .Include(b => b.Organisator) // If you need the Organisator info as well
+            .Include(b => b.Bordspellen) // Include de Bordspellen relatie
             .AsNoTracking()
             .ToListAsync();
     }
-
-
 }

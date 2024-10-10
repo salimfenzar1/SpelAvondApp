@@ -21,6 +21,16 @@ public class BordspellenAvondController : Controller
     public async Task<IActionResult> Index()
     {
         var avonden = await _bordspellenAvondService.GetAllAvondenAsync();
+
+        foreach (var avond in avonden)
+        {
+            if (!string.IsNullOrEmpty(avond.OrganisatorId))
+            {
+                var organisator = await _userManager.FindByIdAsync(avond.OrganisatorId);
+                avond.Organisator = organisator;
+            }
+        }
+
         return View(avonden);
     }
 
@@ -36,19 +46,35 @@ public class BordspellenAvondController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
 
+        if (user == null)
+        {
+            return BadRequest("Er is geen geregistreerde gebruiker gevonden.");
+        }
+
         if (!await _bordspellenAvondService.IsUserEligibleToOrganizeAsync(user))
         {
             return BadRequest("Je moet minimaal 18 jaar oud zijn om een bordspellenavond te organiseren.");
         }
 
         model.OrganisatorId = user.Id;
-        if (ModelState.ContainsKey("Organisator"))
-            ModelState.Remove("Organisator");
+        ModelState.Remove("Organisator");
 
         if (ModelState.IsValid)
         {
-            await _bordspellenAvondService.CreateBordspellenAvondAsync(model, geselecteerdeBordspellen, user.Id);
+            await _bordspellenAvondService.CreateBordspellenAvondAsync(model, geselecteerdeBordspellen);
             return RedirectToAction(nameof(Index));
+        }
+        else
+        {
+            // Print de ModelState-fouten naar de console
+            foreach (var modelStateKey in ModelState.Keys)
+            {
+                var modelStateVal = ModelState[modelStateKey];
+                foreach (var error in modelStateVal.Errors)
+                {
+                    Console.WriteLine($"ModelState error: Key='{modelStateKey}', Error='{error.ErrorMessage}'");
+                }
+            }
         }
 
         var bordspellen = await _bordspellenAvondService.GetAllBordspellenAsync();
@@ -65,12 +91,20 @@ public class BordspellenAvondController : Controller
         }
 
         var avond = await _bordspellenAvondService.GetAvondByIdAsync(id);
+
+        if (avond == null)
+        {
+            return NotFound();
+        }
+
         var bordspellen = await _bordspellenAvondService.GetAllBordspellenAsync();
         ViewBag.Bordspellen = new MultiSelectList(bordspellen, "Id", "Naam", avond.Bordspellen.Select(b => b.Id));
 
+        // Voeg het organisatorId toe aan het model, indien nodig.
+        avond.OrganisatorId = user.Id;
+
         return View(avond);
     }
-
     [HttpPost]
     public async Task<IActionResult> Edit(BordspellenAvond model, List<int> geselecteerdeBordspellen)
     {
@@ -80,6 +114,7 @@ public class BordspellenAvondController : Controller
         {
             return Forbid();
         }
+        model.OrganisatorId = user.Id;
 
         if (ModelState.IsValid)
         {

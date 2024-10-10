@@ -33,17 +33,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDbContext<SpellenDbContext>(options =>
     options.UseSqlServer(spellenDbConnectionString));
 
+
+// Identity configureren zonder rollen
+builder.Services.AddDefaultIdentity<ApplicationUser>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
 builder.Services.AddScoped<IBordspelService, BordspelService>();
 builder.Services.AddScoped<ISpellenRepository, SpellenRepository>();
 builder.Services.AddScoped<IBordspellenAvondService, BordspellenAvondService>();
 
-
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-// Identity configureren zonder rollen
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
-
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

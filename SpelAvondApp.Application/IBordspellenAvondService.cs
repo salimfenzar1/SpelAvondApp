@@ -8,7 +8,7 @@ public interface IBordspellenAvondService
     Task<bool> IsUserEligibleToOrganizeAsync(ApplicationUser user);
 
     // Pas deze methoden aan voor ondersteuning van meerdere bordspellen
-    Task CreateBordspellenAvondAsync(BordspellenAvond avond, List<int> geselecteerdeBordspellen, string organisatorId);
+    Task CreateBordspellenAvondAsync(BordspellenAvond avond, List<int> geselecteerdeBordspellen);
     Task UpdateBordspellenAvondAsync(BordspellenAvond avond, List<int> geselecteerdeBordspellen);
 
     Task<List<BordspellenAvond>> GetAllAvondenAsync();

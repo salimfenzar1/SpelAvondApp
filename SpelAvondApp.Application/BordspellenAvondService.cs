@@ -23,11 +23,9 @@ public class BordspellenAvondService : IBordspellenAvondService
         return age >= 18;
     }
 
-    public async Task CreateBordspellenAvondAsync(BordspellenAvond avond, List<int> geselecteerdeBordspellenIds, string organisatorId)
+    public async Task CreateBordspellenAvondAsync(BordspellenAvond avond, List<int> geselecteerdeBordspellenIds)
     {
-        avond.OrganisatorId = organisatorId;
         avond.Bordspellen = await _repository.GetBordspellenByIdsAsync(geselecteerdeBordspellenIds);
-
         await _repository.AddBordspellenAvondAsync(avond);
     }
 
@@ -43,7 +41,15 @@ public class BordspellenAvondService : IBordspellenAvondService
 
     public async Task<BordspellenAvond> GetAvondByIdAsync(int id)
     {
-        return await _repository.GetBordspellenAvondByIdAsync(id);
+        var avond = await _repository.GetBordspellenAvondByIdAsync(id);
+
+        // Haal organisator-informatie op uit AspNetUsers als OrganisatorId bestaat
+        if (avond != null && !string.IsNullOrEmpty(avond.OrganisatorId))
+        {
+            avond.Organisator = await _userManager.FindByIdAsync(avond.OrganisatorId);
+        }
+
+        return avond;
     }
 
     public async Task<bool> UserCanEditOrDeleteAsync(int avondId, string userId)

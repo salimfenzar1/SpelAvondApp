@@ -1,11 +1,14 @@
 ﻿@model IEnumerable<SpelAvondApp.Domain.Models.BordspellenAvond>
+@using SpelAvondApp.Domain.Models
+@inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> UserManager
 
 @{
     ViewData["Title"] = "Bordspellenavonden Overzicht";
+    var currentUserId = UserManager.GetUserId(User);
 }
 
 <h1>@ViewData["Title"]</h1>
-<a asp-controller="BordspellenAvond" asp-action="Create" class="btn btn-success mb-3">Bordspel Aanmaken</a>
+<a asp-controller="BordspellenAvond" asp-action="Create" class="btn btn-success mb-3">Bordspel Avond Aanmaken</a>
 
 <table class="table table-striped">
     <thead>
@@ -15,8 +18,8 @@
             <th>Organisator</th>
             <th>Max Spelers</th>
             <th>18+</th>
-            <th>Bordspellen</th> 
-            <th>Acties</th> 
+            <th>Bordspellen</th>
+            <th>Acties</th>
         </tr>
     </thead>
     <tbody>
@@ -27,7 +30,7 @@
                 <td>@avond.Adres</td>
                 <td>@avond.Organisator?.UserName</td>
                 <td>@avond.MaxAantalSpelers</td>
-                <td>@(avond.Is18Plus )</td>
+                <td>@(avond.Is18Plus ? "Ja" : "Nee")</td>
                 <td>
                     @if (avond.Bordspellen != null && avond.Bordspellen.Any())
                     {
@@ -44,9 +47,18 @@
                     }
                 </td>
                 <td>
-                    <!-- Acties kolom -->
-                    <a asp-controller="BordspellenAvond" asp-action="Edit" asp-route-id="@avond.Id" class="btn btn-primary btn-sm">Bewerken</a>
-                    <a asp-controller="BordspellenAvond" asp-action="Delete" asp-route-id="@avond.Id" class="btn btn-danger btn-sm">Verwijderen</a>
+                    @if (avond.OrganisatorId == currentUserId)
+                    {
+                        <!-- Acties voor de eigenaar -->
+                        <a asp-controller="BordspellenAvond" asp-action="Edit" asp-route-id="@avond.Id" class="btn btn-primary btn-sm">Bewerken</a>
+                        <a asp-controller="BordspellenAvond" asp-action="Delete" asp-route-id="@avond.Id" class="btn btn-danger btn-sm">Verwijderen</a>
+                    }
+                    else
+                    {
+
+                            <a asp-controller="Inschrijvingen" asp-action="Inschrijven" asp-route-avondId="@avond.Id" class="btn btn-success btn-sm">Inschrijven</a>
+                        
+                    }
                 </td>
             </tr>
         }
