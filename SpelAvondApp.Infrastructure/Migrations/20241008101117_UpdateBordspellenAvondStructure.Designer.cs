@@ -3,16 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using SpelAvondApp.Infrastructure;
 
 #nullable disable
 
 namespace SpelAvondApp.Infrastructure.Migrations
 {
     [DbContext(typeof(SpellenDbContext))]
-    partial class SpellenDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241008101117_UpdateBordspellenAvondStructure")]
+    partial class UpdateBordspellenAvondStructure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -20,21 +24,6 @@ namespace SpelAvondApp.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("BordspelBordspellenAvond", b =>
-                {
-                    b.Property<int>("BordspellenAvondenId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BordspellenId")
-                        .HasColumnType("int");
-
-                    b.HasKey("BordspellenAvondenId", "BordspellenId");
-
-                    b.HasIndex("BordspellenId");
-
-                    b.ToTable("BordspellenAvondBordspellen", (string)null);
-                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
                 {
@@ -130,6 +119,12 @@ namespace SpelAvondApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("BordspelId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BordspelId1")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Datum")
                         .HasColumnType("datetime2");
 
@@ -140,9 +135,15 @@ namespace SpelAvondApp.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("OrganisatorId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BordspelId");
+
+                    b.HasIndex("BordspelId1");
+
+                    b.HasIndex("OrganisatorId");
 
                     b.ToTable("BordspellenAvonden");
                 });
@@ -209,19 +210,24 @@ namespace SpelAvondApp.Infrastructure.Migrations
                     b.ToTable("Reviews");
                 });
 
-            modelBuilder.Entity("BordspelBordspellenAvond", b =>
+            modelBuilder.Entity("SpelAvondApp.Domain.Models.BordspellenAvond", b =>
                 {
-                    b.HasOne("SpelAvondApp.Domain.Models.BordspellenAvond", null)
+                    b.HasOne("SpelAvondApp.Domain.Models.Bordspel", "Bordspel")
                         .WithMany()
-                        .HasForeignKey("BordspellenAvondenId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BordspelId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SpelAvondApp.Domain.Models.Bordspel", null)
+                        .WithMany("BordspellenAvonden")
+                        .HasForeignKey("BordspelId1");
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Organisator")
                         .WithMany()
-                        .HasForeignKey("BordspellenId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("OrganisatorId");
+
+                    b.Navigation("Bordspel");
+
+                    b.Navigation("Organisator");
                 });
 
             modelBuilder.Entity("SpelAvondApp.Domain.Models.Inschrijving", b =>
@@ -235,7 +241,7 @@ namespace SpelAvondApp.Infrastructure.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Speler")
                         .WithMany()
                         .HasForeignKey("SpelerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("BordspellenAvond");
@@ -254,12 +260,17 @@ namespace SpelAvondApp.Infrastructure.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Speler")
                         .WithMany()
                         .HasForeignKey("SpelerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("BordspellenAvond");
 
                     b.Navigation("Speler");
+                });
+
+            modelBuilder.Entity("SpelAvondApp.Domain.Models.Bordspel", b =>
+                {
+                    b.Navigation("BordspellenAvonden");
                 });
 
             modelBuilder.Entity("SpelAvondApp.Domain.Models.BordspellenAvond", b =>

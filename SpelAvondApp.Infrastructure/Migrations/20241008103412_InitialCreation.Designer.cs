@@ -3,16 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using SpelAvondApp.Infrastructure;
 
 #nullable disable
 
 namespace SpelAvondApp.Infrastructure.Migrations
 {
     [DbContext(typeof(SpellenDbContext))]
-    partial class SpellenDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241008103412_InitialCreation")]
+    partial class InitialCreation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -140,9 +144,11 @@ namespace SpelAvondApp.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("OrganisatorId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrganisatorId");
 
                     b.ToTable("BordspellenAvonden");
                 });
@@ -224,6 +230,15 @@ namespace SpelAvondApp.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SpelAvondApp.Domain.Models.BordspellenAvond", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Organisator")
+                        .WithMany()
+                        .HasForeignKey("OrganisatorId");
+
+                    b.Navigation("Organisator");
+                });
+
             modelBuilder.Entity("SpelAvondApp.Domain.Models.Inschrijving", b =>
                 {
                     b.HasOne("SpelAvondApp.Domain.Models.BordspellenAvond", "BordspellenAvond")
@@ -235,7 +250,7 @@ namespace SpelAvondApp.Infrastructure.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Speler")
                         .WithMany()
                         .HasForeignKey("SpelerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("BordspellenAvond");
@@ -254,7 +269,7 @@ namespace SpelAvondApp.Infrastructure.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Speler")
                         .WithMany()
                         .HasForeignKey("SpelerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("BordspellenAvond");

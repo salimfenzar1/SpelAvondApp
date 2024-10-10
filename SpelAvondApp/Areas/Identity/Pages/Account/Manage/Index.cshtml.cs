@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using SpelAvondApp.Data;
+using SpelAvondApp.Domain.Models;
 
 namespace SpelAvondApp.Areas.Identity.Pages.Account.Manage
 {

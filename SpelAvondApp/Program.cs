@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SpelAvondApp.Data;
+using SpelAvondApp.Domain.Models;
 using SpelAvondApp.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,12 +33,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDbContext<SpellenDbContext>(options =>
     options.UseSqlServer(spellenDbConnectionString));
 
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // Identity configureren zonder rollen
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddDefaultIdentity<ApplicationUser>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
+builder.Services.AddScoped<IBordspelService, BordspelService>();
+builder.Services.AddScoped<ISpellenRepository, SpellenRepository>();
+builder.Services.AddScoped<IBordspellenAvondService, BordspellenAvondService>();
+
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

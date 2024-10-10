@@ -1,30 +1,25 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SpelAvondApp.Domain.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SpelAvondApp.Domain.Models
 {
     public class BordspellenAvond
     {
-        public int Id { get; set; } // Primary Key
+        public int Id { get; set; }
         public string Adres { get; set; }
         public DateTime Datum { get; set; }
         public int MaxAantalSpelers { get; set; }
-        public bool Is18Plus { get; set; } // Of de avond alleen voor 18+ is
+        public bool Is18Plus { get; set; }
 
-        // Buitenlandse sleutel naar de organisator (IdentityUser)
-        public string OrganisatorId { get; set; }
-        public IdentityUser Organisator { get; set; }
+        // Opslaan van de UserId als string
+        public string? OrganisatorId { get; set; }
 
-        // Relatie naar de inschrijvingen (veel-op-veel)
-        public ICollection<Inschrijving> Inschrijvingen { get; set; }
+        // Navigatie-eigenschap zonder fysieke koppeling in de database
+        [NotMapped]
+        public ApplicationUser? Organisator { get; set; }
 
-        // Veel-op-veel relatie met Bordspel
-        public ICollection<Bordspel> Bordspellen { get; set; }
-
-        public ICollection<Review> Reviews { get; set; }
+        public ICollection<Bordspel> Bordspellen { get; set; } = new List<Bordspel>();
+        public ICollection<Inschrijving> Inschrijvingen { get; set; } = new List<Inschrijving>();
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }
 }
