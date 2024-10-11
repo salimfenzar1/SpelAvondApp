@@ -25,9 +25,6 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
                          @if (SignInManager.IsSignedIn(User)) 
                         {
                             <li class="nav-item">
@@ -36,9 +33,16 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="BordspellenAvond" asp-action="Index">Bordspellenavonden</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="BordspellenAvond" asp-action="BeheerdersOverzicht">Mijn Avonden</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="mijnAvondenDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Mijn Avonden
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="mijnAvondenDropdown">
+                                    <li><a class="dropdown-item" asp-controller="BordspellenAvond" asp-action="BeheerdersOverzicht">Mijn Gemaakte Avonden</a></li>
+                                    <li><a class="dropdown-item" asp-controller="BordspellenAvond" asp-action="MijnIngeschrevenAvonden">Avonden Waarbij Ik Ben Ingeschreven</a></li>
+                                </ul>
                             </li>
+
 
                         }
                     </ul>

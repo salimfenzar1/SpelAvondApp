@@ -22,4 +22,6 @@ public interface IBordspellenAvondService
     Task<BordspellenAvond> GetAvondWithInschrijvingenAsync(int id);
 
     Task<List<BordspellenAvond>> GetAvondenByOrganisatorAsync(string organisatorId);
+    public Task<List<BordspellenAvond>> GetAvondenWaarIngeschrevenAsync(string userId);
+
 }

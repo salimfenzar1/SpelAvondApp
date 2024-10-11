@@ -186,4 +186,14 @@ public class BordspellenAvondController : Controller
         return View(avonden);
     }
 
+
+    public async Task<IActionResult> MijnIngeschrevenAvonden()
+    {
+        var userId = _userManager.GetUserId(User);
+        var ingeschrevenAvonden = await _bordspellenAvondService.GetAvondenWaarIngeschrevenAsync(userId);
+
+        return View(ingeschrevenAvonden);
+    }
+
+
 }

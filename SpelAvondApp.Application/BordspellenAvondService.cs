@@ -83,4 +83,11 @@ public class BordspellenAvondService : IBordspellenAvondService
     {
         return await _repository.GetAvondenByOrganisatorAsync(organisatorId);
     }
+
+    public async Task<List<BordspellenAvond>> GetAvondenWaarIngeschrevenAsync(string userId)
+    {
+        var avonden = await _repository.GetAvondenWaarIngeschrevenAsync(userId);
+        return avonden;
+    }
+
 }

@@ -153,4 +153,13 @@ public class SpellenRepository : ISpellenRepository
             .ToListAsync();
     }
 
+    public async Task<List<BordspellenAvond>> GetAvondenWaarIngeschrevenAsync(string userId)
+    {
+        return await _context.BordspellenAvonden
+            .Include(a => a.Inschrijvingen)
+            .Where(a => a.Inschrijvingen.Any(i => i.SpelerId == userId))
+            .ToListAsync();
+    }
+
+
 }

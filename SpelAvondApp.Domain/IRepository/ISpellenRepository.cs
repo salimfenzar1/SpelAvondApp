@@ -27,4 +27,5 @@ public interface ISpellenRepository
     Task<List<BordspellenAvond>> GetAvondenByOrganisatorAsync(string organisatorId);
 
     Task<Inschrijving> GetInschrijvingAsync(string userId, int avondId);
+    Task<List<BordspellenAvond>> GetAvondenWaarIngeschrevenAsync(string userId);
 }

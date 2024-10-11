@@ -68,7 +68,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication(); // Zorg ervoor dat authenticatie is ingeschakeld
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 app.MapControllerRoute(
