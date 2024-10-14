@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace SpelAvondApp.Infrastructure.Migrations
 {
     [DbContext(typeof(SpellenDbContext))]
-    partial class SpellenDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241010145717_UpdateInschrijvingModel")]
+    partial class UpdateInschrijvingModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,10 +103,6 @@ namespace SpelAvondApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FotoPath")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Genre")
                         .HasColumnType("int");
 
@@ -133,18 +132,6 @@ namespace SpelAvondApp.Infrastructure.Migrations
                     b.Property<string>("Adres")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("BiedtAlcoholvrijeOpties")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("BiedtLactosevrijeOpties")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("BiedtNotenvrijeOpties")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("BiedtVegetarischeOpties")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime>("Datum")
                         .HasColumnType("datetime2");

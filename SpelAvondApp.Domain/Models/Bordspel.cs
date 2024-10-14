@@ -9,10 +9,10 @@ namespace SpelAvondApp.Domain.Models
         public int Id { get; set; } // Primary Key
 
         [Required(ErrorMessage = "Naam is verplicht.")]
-        public string Naam { get; set; }
+        public string Naam { get; set; } = string.Empty;    
 
         [Required(ErrorMessage = "Beschrijving is verplicht.")]
-        public string Beschrijving { get; set; }
+        public string Beschrijving { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Genre is verplicht.")]
         public Genre Genre { get; set; }
@@ -21,6 +21,7 @@ namespace SpelAvondApp.Domain.Models
 
         [Required(ErrorMessage = "SoortSpel is verplicht.")]
         public SoortSpel SoortSpel { get; set; }
+        public string FotoPath { get; set; } = String.Empty;
 
         public ICollection<BordspellenAvond> BordspellenAvonden { get; set; } = new List<BordspellenAvond>();
     }

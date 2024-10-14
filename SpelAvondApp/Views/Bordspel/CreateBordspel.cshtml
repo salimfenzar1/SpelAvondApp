@@ -1,52 +1,77 @@
 ﻿@using SpelAvondApp.Domain.Models
 @model SpelAvondApp.Domain.Models.Bordspel
 
-
 @{
     ViewData["Title"] = "Nieuw Bordspel";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1 class="text-center my-4">@ViewData["Title"]</h1>
 
-<form asp-action="CreateBordspel" method="post">
-    <div class="form-group">
-        <label asp-for="Naam" class="form-label"></label>
-        <input asp-for="Naam" class="form-control" />
-        <span asp-validation-for="Naam" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Beschrijving" class="form-label"></label>
-        <textarea asp-for="Beschrijving" class="form-control"></textarea>
-        <span asp-validation-for="Beschrijving" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Genre"></label>
-        <select asp-for="Genre" class="form-control">
-            @foreach (var genre in Enum.GetValues(typeof(Genre)))
-            {
-                <option value="@genre">@genre</option>
-            }
-        </select>
-        <span asp-validation-for="Genre" class="text-danger"></span>
-    </div>
+<div class="card shadow-sm mx-auto" style="max-width: 600px;">
+    <div class="card-body">
+        <form asp-action="CreateBordspel" method="post" enctype="multipart/form-data">
+            <!-- Naam -->
+            <div class="mb-3">
+                <label asp-for="Naam" class="form-label fw-bold">Naam</label>
+                <input asp-for="Naam" class="form-control" placeholder="Voer de naam van het bordspel in" />
+                <span asp-validation-for="Naam" class="text-danger"></span>
+            </div>
 
-    <div class="form-group">
-        <label asp-for="SoortSpel"></label>
-        <select asp-for="SoortSpel" class="form-control">
-            @foreach (var soort in Enum.GetValues(typeof(SoortSpel)))
-            {
-                <option value="@soort">@soort</option>
-            }
-        </select>
-        <span asp-validation-for="SoortSpel" class="text-danger"></span>
+            <!-- Beschrijving -->
+            <div class="mb-3">
+                <label asp-for="Beschrijving" class="form-label fw-bold">Beschrijving</label>
+                <textarea asp-for="Beschrijving" class="form-control" rows="3" placeholder="Geef een korte beschrijving van het spel"></textarea>
+                <span asp-validation-for="Beschrijving" class="text-danger"></span>
+            </div>
+
+            <!-- Genre -->
+            <div class="mb-3">
+                <label asp-for="Genre" class="form-label fw-bold">Genre</label>
+                <select asp-for="Genre" class="form-control">
+                    @foreach (var genre in Enum.GetValues(typeof(Genre)))
+                    {
+                        <option value="@genre">@genre</option>
+                    }
+                </select>
+                <span asp-validation-for="Genre" class="text-danger"></span>
+            </div>
+
+            <!-- Soort Spel -->
+            <div class="mb-3">
+                <label asp-for="SoortSpel" class="form-label fw-bold">Soort Spel</label>
+                <select asp-for="SoortSpel" class="form-control">
+                    @foreach (var soort in Enum.GetValues(typeof(SoortSpel)))
+                    {
+                        <option value="@soort">@soort</option>
+                    }
+                </select>
+                <span asp-validation-for="SoortSpel" class="text-danger"></span>
+            </div>
+
+            <!-- 18+ Check -->
+            <div class="form-check mb-4">
+                <input asp-for="Is18Plus" class="form-check-input" type="checkbox" id="is18Plus" />
+                <label asp-for="Is18Plus" class="form-check-label fw-bold" for="is18Plus">
+                    <i class="bi bi-exclamation-triangle"></i> Alleen voor 18+
+                </label>
+                <span asp-validation-for="Is18Plus" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Upload een Foto</label>
+                <input type="file" name="Foto" class="form-control" />
+                <span class="text-muted">Maximale bestandsgrootte: 5 MB</span>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-save"></i> Opslaan
+                </button>
+            </div>
+        </form>
     </div>
-    <div class="form-check mb-3">
-        <input asp-for="Is18Plus" class="form-check-input" type="checkbox" id="is18Plus" />
-        <label asp-for="Is18Plus" class="form-check-label" for="is18Plus">Is 18+</label>
-        <span asp-validation-for="Is18Plus" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">Opslaan</button>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

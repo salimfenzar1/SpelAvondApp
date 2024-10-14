@@ -32,6 +32,26 @@
                 <span asp-validation-for="Input.Geslacht" class="text-danger"></span>
             </div>
 
+            <div>
+                <label>Dieetwensen en allergieën:</label>
+                <div class="form-check">
+                    <input asp-for="Input.HeeftLactoseAllergie" class="form-check-input" type="checkbox" />
+                    <label asp-for="Input.HeeftLactoseAllergie" class="form-check-label">Lactose Allergie</label>
+                </div>
+                <div class="form-check">
+                    <input asp-for="Input.HeeftNotenAllergie" class="form-check-input" type="checkbox" />
+                    <label asp-for="Input.HeeftNotenAllergie" class="form-check-label">Noten Allergie</label>
+                </div>
+                <div class="form-check">
+                    <input asp-for="Input.IsVegetarisch" class="form-check-input" type="checkbox" />
+                    <label asp-for="Input.IsVegetarisch" class="form-check-label">Vegetarisch</label>
+                </div>
+                <div class="form-check">
+                    <input asp-for="Input.GeenAlcohol" class="form-check-input" type="checkbox" />
+                    <label asp-for="Input.GeenAlcohol" class="form-check-label">Geen Alcohol</label>
+                </div>
+            </div>
+
             <!-- Straat -->
             <div class="form-floating mb-3">
                 <input asp-for="Input.Straat" class="form-control" placeholder="Straat" aria-required="true" />
@@ -59,6 +79,7 @@
                 <label asp-for="Input.Geboortedatum">Geboortedatum</label>
                 <span asp-validation-for="Input.Geboortedatum" class="text-danger"></span>
             </div>
+     
 
             <!-- Email -->
             <div class="form-floating mb-3">
@@ -80,6 +101,8 @@
                 <label asp-for="Input.ConfirmPassword">Confirm Password</label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
+     
+
 
             <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </form>

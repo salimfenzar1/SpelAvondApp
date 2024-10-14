@@ -4,33 +4,63 @@
     ViewData["Title"] = "Alle Bordspellen";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1 class="my-4 text-center">@ViewData["Title"]</h1>
 
-<a asp-controller="Bordspel" asp-action="CreateBordspel" class="btn btn-success mb-3">Bordspel Aanmaken</a>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <a asp-controller="Bordspel" asp-action="CreateBordspel" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Bordspel Aanmaken
+    </a>
+</div>
 
-<table class="table table-striped">
-    <thead>
+<table class="table table-hover table-bordered align-middle">
+    <thead class="table-primary text-center">
         <tr>
-            <th>Naam</th>
+            <th>Foto</th>
+            <th style ="width: 250px;">Naam</th>
             <th>Beschrijving</th>
             <th>Genre</th>
             <th>Soort Spel</th>
             <th>18+</th>
-            <th>Acties</th> <!-- Nieuwe kolom voor acties -->
+            <th style="width: 150px;">Acties</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var bordspel in Model)
         {
             <tr>
-                <td>@bordspel.Naam</td>
+                <td class="text-center">
+                    @if (!string.IsNullOrEmpty(bordspel.FotoPath))
+                    {
+                        <img src="@bordspel.FotoPath" alt="Foto van @bordspel.Naam" class="img-thumbnail" style="width: 100px; height: auto;" />
+                    }
+                    else
+                    {
+                        <span class="text-muted">Geen foto beschikbaar</span>
+                    }
+                </td>
+                <td><i class="bi bi-controller"></i> @bordspel.Naam</td>
                 <td>@bordspel.Beschrijving</td>
                 <td>@bordspel.Genre</td>
                 <td>@bordspel.SoortSpel</td>
-                <td>@bordspel.Is18Plus</td>
-                <td>
-                    <a asp-controller="Bordspel" asp-action="EditBordspel" asp-route-id="@bordspel.Id" class="btn btn-primary btn-sm">Bewerken</a>
-                    <a asp-controller="Bordspel" asp-action="DeleteBordspel" asp-route-id="@bordspel.Id" class="btn btn-danger btn-sm">Verwijderen</a>
+                <td class="text-center">
+                    @if (bordspel.Is18Plus)
+                    {
+                        <span class="badge bg-danger">Ja</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Nee</span>
+                    }
+                </td>
+                <td class="text-center">
+                    <div class="d-flex gap-1 justify-content-center">
+                        <a asp-controller="Bordspel" asp-action="EditBordspel" asp-route-id="@bordspel.Id" class="btn btn-primary btn-sm">
+                            <i class="bi bi-pencil-square"></i> Bewerken
+                        </a>
+                        <a asp-controller="Bordspel" asp-action="DeleteBordspel" asp-route-id="@bordspel.Id" class="btn btn-danger btn-sm">
+                            <i class="bi bi-trash"></i> Verwijderen
+                        </a>
+                    </div>
                 </td>
             </tr>
         }

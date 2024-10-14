@@ -17,6 +17,10 @@ namespace SpelAvondApp.Domain.Models
         // Navigatie-eigenschap zonder fysieke koppeling in de database
         [NotMapped]
         public ApplicationUser? Organisator { get; set; }
+        public bool BiedtLactosevrijeOpties { get; set; }
+        public bool BiedtNotenvrijeOpties { get; set; }
+        public bool BiedtVegetarischeOpties { get; set; }
+        public bool BiedtAlcoholvrijeOpties { get; set; }
 
         public ICollection<Bordspel> Bordspellen { get; set; } = new List<Bordspel>();
         public ICollection<Inschrijving> Inschrijvingen { get; set; } = new List<Inschrijving>();

@@ -1,0 +1,34 @@
+﻿@model IEnumerable<SpelAvondApp.Domain.Models.BordspellenAvond>
+
+<h1 class="my-3">Avonden Waarbij Ik Ben Ingeschreven</h1>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-primary">
+        <tr>
+            <th>Datum en Tijd</th>
+            <th>Adres</th>
+            <th>Max Spelers</th>
+            <th>18+</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var avond in Model)
+        {
+            <tr>
+                <td>@avond.Datum.ToString("dd-MM-yyyy HH:mm")</td>
+                <td>@avond.Adres</td>
+                <td>@avond.MaxAantalSpelers</td>
+                <td>
+                    @if (avond.Is18Plus)
+                    {
+                        <span class="badge bg-danger">Ja</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Nee</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

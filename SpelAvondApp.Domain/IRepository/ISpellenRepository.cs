@@ -19,4 +19,15 @@ public interface ISpellenRepository
     Task<List<BordspellenAvond>> GetAllBordspellenAvondenAsync();
 
     Task<List<Bordspel>> GetBordspellenByIdsAsync(List<int> ids);
+
+    Task AddInschrijvingAsync(Inschrijving inschrijving);
+
+    Task<BordspellenAvond> GetAvondWithInschrijvingenAsync(int id);
+
+    Task<List<BordspellenAvond>> GetAvondenByOrganisatorAsync(string organisatorId);
+
+    Task<Inschrijving> GetInschrijvingAsync(string userId, int avondId);
+    Task<List<BordspellenAvond>> GetAvondenWaarIngeschrevenAsync(string userId);
+
+    Task<BordspellenAvond> GetAvondMetDieetOptiesAsync(int avondId);
 }
