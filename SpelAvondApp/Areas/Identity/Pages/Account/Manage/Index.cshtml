@@ -66,6 +66,25 @@
                 <span asp-validation-for="Input.Geboortedatum" class="text-danger"></span>
             </div>
 
+            <!-- Dieetwensen -->
+            <h5 class="mt-4">Dieetwensen</h5>
+            <div class="form-check mb-2">
+                <input asp-for="Input.HeeftLactoseAllergie" class="form-check-input" type="checkbox" id="lactosevrij" />
+                <label class="form-check-label" for="lactosevrij">Lactosevrij</label>
+            </div>
+            <div class="form-check mb-2">
+                <input asp-for="Input.HeeftNotenAllergie" class="form-check-input" type="checkbox" id="notenvrij" />
+                <label class="form-check-label" for="notenvrij">Notenvrij</label>
+            </div>
+            <div class="form-check mb-2">
+                <input asp-for="Input.IsVegetarisch" class="form-check-input" type="checkbox" id="vegetarisch" />
+                <label class="form-check-label" for="vegetarisch">Vegetarisch</label>
+            </div>
+            <div class="form-check mb-2">
+                <input asp-for="Input.GeenAlcohol" class="form-check-input" type="checkbox" id="alcoholvrij" />
+                <label class="form-check-label" for="alcoholvrij">Geen Alcohol</label>
+            </div>
+
 
 
             <!-- Opslaan-knop -->

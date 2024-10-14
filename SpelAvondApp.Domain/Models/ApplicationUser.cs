@@ -33,5 +33,9 @@ namespace SpelAvondApp.Domain.Models
                 return DateTime.Now.Year - Geboortedatum.Year >= 18;
             }
         }
+        public bool HeeftLactoseAllergie { get; set; }
+        public bool HeeftNotenAllergie { get; set; }
+        public bool IsVegetarisch { get; set; }
+        public bool GeenAlcohol { get; set; }
     }
 }

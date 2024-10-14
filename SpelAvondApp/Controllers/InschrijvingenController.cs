@@ -27,6 +27,7 @@ namespace SpelAvondApp.Controllers
                 return RedirectToAction("Index", "BordspellenAvond");
             }
 
+            // Controleer of de gebruiker al is ingeschreven
             var inschrijvingBestaatAl = await _inschrijvingService.HeeftAlIngeschreven(user.Id, avondId);
             if (inschrijvingBestaatAl)
             {
@@ -34,6 +35,25 @@ namespace SpelAvondApp.Controllers
                 return RedirectToAction("Index", "BordspellenAvond");
             }
 
+            // Haal de bordspellenavond inclusief dieetopties op
+            var avond = await _inschrijvingService.GetAvondMetDieetOptiesAsync(avondId);
+            if (avond == null)
+            {
+                TempData["ErrorMessage"] = "De bordspellenavond is niet gevonden.";
+                return RedirectToAction("Index", "BordspellenAvond");
+            }
+
+            // Controleer of de dieetwensen van de gebruiker overeenkomen met de opties voor de avond
+            if ((user.HeeftLactoseAllergie && !avond.BiedtLactosevrijeOpties) ||
+                (user.HeeftNotenAllergie && !avond.BiedtNotenvrijeOpties) ||
+                (user.IsVegetarisch && !avond.BiedtVegetarischeOpties) ||
+                (user.GeenAlcohol && !avond.BiedtAlcoholvrijeOpties))
+            {
+                TempData["ErrorMessage"] = "Let op: De bordspellenavond voldoet mogelijk niet aan jouw dieetwensen of allergieën.";
+                return RedirectToAction("Index", "BordspellenAvond");
+            }
+
+            // Schrijf de gebruiker in voor de avond
             var success = await _inschrijvingService.InschrijvenVoorAvondAsync(user.Id, avondId, "Geen specifieke dieetwensen");
             if (success)
             {

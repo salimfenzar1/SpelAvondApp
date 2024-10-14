@@ -62,6 +62,10 @@ namespace SpelAvondApp.Areas.Identity.Pages.Account.Manage
             public string Huisnummer { get; set; }
             public string Stad { get; set; }
             public DateTime Geboortedatum { get; set; }
+            public bool HeeftLactoseAllergie { get; set; }
+            public bool HeeftNotenAllergie { get; set; }
+            public bool IsVegetarisch { get; set; }
+            public bool GeenAlcohol { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
@@ -75,7 +79,11 @@ namespace SpelAvondApp.Areas.Identity.Pages.Account.Manage
                 Straat = user.Straat,
                 Huisnummer = user.Huisnummer,
                 Stad = user.Stad,
-                Geboortedatum = user.Geboortedatum
+                Geboortedatum = user.Geboortedatum,
+                HeeftLactoseAllergie = user.HeeftLactoseAllergie,
+                HeeftNotenAllergie = user.HeeftNotenAllergie,
+                IsVegetarisch = user.IsVegetarisch,
+                GeenAlcohol = user.GeenAlcohol
             };
 
             Username = userName;
@@ -138,6 +146,11 @@ namespace SpelAvondApp.Areas.Identity.Pages.Account.Manage
             if (Input.Huisnummer != user.Huisnummer) user.Huisnummer = Input.Huisnummer;
             if (Input.Stad != user.Stad) user.Stad = Input.Stad;
             if (Input.Geboortedatum != user.Geboortedatum) user.Geboortedatum = Input.Geboortedatum;
+
+            user.HeeftLactoseAllergie = Input.HeeftLactoseAllergie;
+            user.HeeftNotenAllergie = Input.HeeftNotenAllergie;
+            user.IsVegetarisch = Input.IsVegetarisch;
+            user.GeenAlcohol = Input.GeenAlcohol;
 
             // Profiel bijwerken
             var updateResult = await _userManager.UpdateAsync(user);

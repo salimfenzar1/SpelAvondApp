@@ -68,5 +68,9 @@ public class InschrijvingService : IInschrijvingService
 
         return avond;
     }
+    public async Task<BordspellenAvond> GetAvondMetDieetOptiesAsync(int avondId)
+    {
+        return await _repository.GetAvondMetDieetOptiesAsync(avondId);
+    }
 
 }

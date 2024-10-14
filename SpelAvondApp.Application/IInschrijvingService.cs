@@ -12,5 +12,6 @@ namespace SpelAvondApp.Application
         Task<bool> InschrijvenVoorAvondAsync(string userId, int avondId, string dieetWensen);
         Task<bool> HeeftAlIngeschreven(string userId, int avondId);
         Task<BordspellenAvond> GetAvondWithInschrijvingenAndUserNamesAsync(int avondId);
+        Task<BordspellenAvond> GetAvondMetDieetOptiesAsync(int avondId);
     }
 }

@@ -108,6 +108,11 @@ namespace SpelAvondApp.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            public bool HeeftLactoseAllergie { get; set; }
+            public bool HeeftNotenAllergie { get; set; }
+            public bool IsVegetarisch { get; set; }
+            public bool GeenAlcohol { get; set; }
         }
 
 
@@ -142,7 +147,11 @@ namespace SpelAvondApp.Areas.Identity.Pages.Account
                     Straat = Input.Straat,
                     Huisnummer = Input.Huisnummer,
                     Stad = Input.Stad,
-                    Geboortedatum = Input.Geboortedatum
+                    Geboortedatum = Input.Geboortedatum,
+                     HeeftLactoseAllergie = Input.HeeftLactoseAllergie,
+                    HeeftNotenAllergie = Input.HeeftNotenAllergie,
+                    IsVegetarisch = Input.IsVegetarisch,
+                    GeenAlcohol = Input.GeenAlcohol
                 };
 
                 var result = await _userManager.CreateAsync(user, Input.Password);

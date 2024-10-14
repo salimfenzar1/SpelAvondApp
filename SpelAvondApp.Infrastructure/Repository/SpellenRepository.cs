@@ -161,5 +161,29 @@ public class SpellenRepository : ISpellenRepository
             .ToListAsync();
     }
 
+    public async Task<BordspellenAvond> GetAvondMetDieetOptiesAsync(int avondId)
+    {
+        return await _context.BordspellenAvonden
+            .AsNoTracking() // Optioneel, omdat we alleen lezen
+            .Where(avond => avond.Id == avondId)
+            .Select(avond => new BordspellenAvond
+            {
+                Id = avond.Id,
+                Adres = avond.Adres,
+                Datum = avond.Datum,
+                MaxAantalSpelers = avond.MaxAantalSpelers,
+                Is18Plus = avond.Is18Plus,
+                OrganisatorId = avond.OrganisatorId,
+
+                // Voegt dieetopties toe
+                BiedtLactosevrijeOpties = avond.BiedtLactosevrijeOpties,
+                BiedtNotenvrijeOpties = avond.BiedtNotenvrijeOpties,
+                BiedtVegetarischeOpties = avond.BiedtVegetarischeOpties,
+                BiedtAlcoholvrijeOpties = avond.BiedtAlcoholvrijeOpties
+            })
+            .FirstOrDefaultAsync();
+    }
+
+
 
 }

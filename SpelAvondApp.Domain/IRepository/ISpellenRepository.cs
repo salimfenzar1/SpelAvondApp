@@ -28,4 +28,6 @@ public interface ISpellenRepository
 
     Task<Inschrijving> GetInschrijvingAsync(string userId, int avondId);
     Task<List<BordspellenAvond>> GetAvondenWaarIngeschrevenAsync(string userId);
+
+    Task<BordspellenAvond> GetAvondMetDieetOptiesAsync(int avondId);
 }

@@ -9,25 +9,30 @@
     var errorMessage = TempData["ErrorMessage"] as string;
 }
 
-<h1>@ViewData["Title"]</h1>
-<a asp-controller="BordspellenAvond" asp-action="Create" class="btn btn-success mb-3">Bordspel Avond Aanmaken</a>
+<h1 class="my-4 text-center">@ViewData["Title"]</h1>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <a asp-controller="BordspellenAvond" asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Bordspel Avond Aanmaken
+    </a>
+</div>
 
 @if (!string.IsNullOrEmpty(successMessage))
 {
     <div class="alert alert-success" role="alert">
-        @successMessage
+        <i class="bi bi-check-circle"></i> @successMessage
     </div>
 }
 
 @if (!string.IsNullOrEmpty(errorMessage))
 {
     <div class="alert alert-danger" role="alert">
-        @errorMessage
+        <i class="bi bi-exclamation-circle"></i> @errorMessage
     </div>
 }
 
-<table class="table table-striped">
-    <thead>
+<table class="table table-hover table-bordered align-middle">
+    <thead class="table-primary text-center">
         <tr>
             <th>Datum en Tijd</th>
             <th>Adres</th>
@@ -35,6 +40,7 @@
             <th>Max Spelers</th>
             <th>18+</th>
             <th>Bordspellen</th>
+            <th>Dieetopties</th>
             <th>Acties</th>
         </tr>
     </thead>
@@ -45,33 +51,80 @@
                 <td>@avond.Datum.ToString("dd-MM-yyyy HH:mm")</td>
                 <td>@avond.Adres</td>
                 <td>@avond.Organisator?.UserName</td>
-                <td>@avond.MaxAantalSpelers</td>
-                <td>@(avond.Is18Plus ? "Ja" : "Nee")</td>
+                <td class="text-center">@avond.MaxAantalSpelers</td>
+                <td class="text-center">@if (avond.Is18Plus)
+                    {
+                        <span class="badge bg-danger">Ja</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Nee</span>
+                    }</td>
                 <td>
                     @if (avond.Bordspellen != null && avond.Bordspellen.Any())
                     {
-                        <ul>
+                        <ul class="list-unstyled mb-0">
                             @foreach (var bordspel in avond.Bordspellen)
                             {
-                                <li>@bordspel.Naam</li>
+                                <li><i class="bi bi-controller"></i> @bordspel.Naam</li>
                             }
                         </ul>
                     }
                     else
                     {
-                        <span>Geen bordspellen geselecteerd</span>
+                        <span class="text-muted">Geen bordspellen geselecteerd</span>
                     }
                 </td>
                 <td>
+                    <ul class="list-unstyled mb-0">
+                        @{
+                            bool hasOptions = false;
+
+                            if (avond.BiedtLactosevrijeOpties)
+                            {
+                                <li><i class="bi bi-droplet"></i> Lactosevrij</li>
+                                hasOptions = true;
+                            }
+                            if (avond.BiedtNotenvrijeOpties)
+                            {
+                                <li><i class="bi bi-nut-fill"></i> Notenvrij</li>
+                                hasOptions = true;
+                            }
+                            if (avond.BiedtVegetarischeOpties)
+                            {
+                                <li><i class="bi bi-leaf"></i> Vegetarisch</li>
+                                hasOptions = true;
+                            }
+                            if (avond.BiedtAlcoholvrijeOpties)
+                            {
+                                <li><i class="bi bi-cup-straw"></i> Geen Alcohol</li>
+                                hasOptions = true;
+                            }
+
+                            if (!hasOptions)
+                            {
+                                <li class="text-muted">Geen speciale dieetopties beschikbaar</li>
+                            }
+                        }
+                    </ul>
+                </td>
+                <td class="text-center">
                     @if (avond.OrganisatorId == currentUserId)
                     {
-                        <!-- Acties voor de eigenaar -->
-                        <a asp-controller="BordspellenAvond" asp-action="Edit" asp-route-id="@avond.Id" class="btn btn-primary btn-sm">Bewerken</a>
-                        <a asp-controller="BordspellenAvond" asp-action="Delete" asp-route-id="@avond.Id" class="btn btn-danger btn-sm">Verwijderen</a>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a asp-controller="BordspellenAvond" asp-action="Edit" asp-route-id="@avond.Id" class="btn btn-primary btn-sm">
+                                <i class="bi bi-pencil-square"></i> Bewerken
+                            </a>
+                            <a asp-controller="BordspellenAvond" asp-action="Delete" asp-route-id="@avond.Id" class="btn btn-danger btn-sm">
+                                <i class="bi bi-trash"></i> Verwijderen
+                            </a>
+                        </div>
                     }
                     else
                     {
-                            <a asp-controller="Inschrijvingen" asp-action="Inschrijven" asp-route-avondId="@avond.Id" class="btn btn-success btn-sm">Inschrijven</a>
+                        <a asp-controller="Inschrijvingen" asp-action="Inschrijven" asp-route-avondId="@avond.Id" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-check-circle"></i> Inschrijven
+                        </a>
                     }
                 </td>
             </tr>

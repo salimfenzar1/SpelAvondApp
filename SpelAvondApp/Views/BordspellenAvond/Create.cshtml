@@ -3,40 +3,74 @@
     ViewData["Title"] = "Nieuwe Bordspellenavond Aanmaken";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1 class="my-3 text-center">@ViewData["Title"]</h1>
 
-<form asp-action="Create" method="post">
-    <div class="form-group">
-        <label asp-for="Datum">Datum en Tijd</label>
-        <input asp-for="Datum" class="form-control" type="datetime-local" />
-        <span asp-validation-for="Datum" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Adres">Adres</label>
-        <input asp-for="Adres" class="form-control" />
-        <span asp-validation-for="Adres" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="MaxAantalSpelers">Maximaal Aantal Spelers</label>
-        <input asp-for="MaxAantalSpelers" class="form-control" type="number" />
-        <span asp-validation-for="MaxAantalSpelers" class="text-danger"></span>
-    </div>
-    <div class="form-check mb-3">
-        <input asp-for="Is18Plus" class="form-check-input" type="checkbox" />
-        <label asp-for="Is18Plus" class="form-check-label">Alleen voor 18+</label>
-        <span asp-validation-for="Is18Plus" class="text-danger"></span>
-    </div>
+<div class="container p-4 shadow-sm rounded bg-light">
+    <form asp-action="Create" method="post">
+        <!-- Datum en Tijd -->
+        <div class="mb-3">
+            <label asp-for="Datum" class="form-label">Datum en Tijd</label>
+            <input asp-for="Datum" class="form-control" type="datetime-local" />
+            <span asp-validation-for="Datum" class="text-danger"></span>
+        </div>
 
-    <div class="form-group">
-        <label for="geselecteerdeBordspellen">Kies Bordspellen</label>
-        <select asp-for="Bordspellen" asp-items="ViewBag.Bordspellen" class="form-control" multiple="multiple" name="geselecteerdeBordspellen">
-        </select>
-        <span asp-validation-for="Bordspellen" class="text-danger"></span>
-    </div>
+        <!-- Adres -->
+        <div class="mb-3">
+            <label asp-for="Adres" class="form-label">Adres</label>
+            <input asp-for="Adres" class="form-control" placeholder="Voer het adres in" />
+            <span asp-validation-for="Adres" class="text-danger"></span>
+        </div>
 
+        <!-- Maximaal Aantal Spelers -->
+        <div class="mb-3">
+            <label asp-for="MaxAantalSpelers" class="form-label">Maximaal Aantal Spelers</label>
+            <input asp-for="MaxAantalSpelers" class="form-control" type="number" placeholder="Voer het maximale aantal spelers in" />
+            <span asp-validation-for="MaxAantalSpelers" class="text-danger"></span>
+        </div>
 
-    <button type="submit" class="btn btn-primary">Opslaan</button>
-</form>
+        <!-- Alleen voor 18+ -->
+        <div class="form-check mb-4">
+            <input asp-for="Is18Plus" class="form-check-input" type="checkbox" id="is18PlusCheckbox" />
+            <label asp-for="Is18Plus" class="form-check-label" for="is18PlusCheckbox">Alleen voor 18+</label>
+            <span asp-validation-for="Is18Plus" class="text-danger"></span>
+        </div>
+
+        <!-- Dieetopties Sectie -->
+        <h4 class="mt-4">Beschikbare Dieetopties</h4>
+        <div class="form-check mb-2">
+            <input asp-for="BiedtLactosevrijeOpties" class="form-check-input" type="checkbox" id="lactosevrijCheckbox" />
+            <label asp-for="BiedtLactosevrijeOpties" class="form-check-label" for="lactosevrijCheckbox">Lactosevrije Opties Beschikbaar</label>
+        </div>
+        <div class="form-check mb-2">
+            <input asp-for="BiedtNotenvrijeOpties" class="form-check-input" type="checkbox" id="notenvrijCheckbox" />
+            <label asp-for="BiedtNotenvrijeOpties" class="form-check-label" for="notenvrijCheckbox">Notenvrije Opties Beschikbaar</label>
+        </div>
+        <div class="form-check mb-2">
+            <input asp-for="BiedtVegetarischeOpties" class="form-check-input" type="checkbox" id="vegetarischCheckbox" />
+            <label asp-for="BiedtVegetarischeOpties" class="form-check-label" for="vegetarischCheckbox">Vegetarische Opties Beschikbaar</label>
+        </div>
+        <div class="form-check mb-4">
+            <input asp-for="BiedtAlcoholvrijeOpties" class="form-check-input" type="checkbox" id="alcoholvrijCheckbox" />
+            <label asp-for="BiedtAlcoholvrijeOpties" class="form-check-label" for="alcoholvrijCheckbox">Alcoholvrije Opties Beschikbaar</label>
+        </div>
+
+        <!-- Bordspellen Selectie -->
+        <div class="mb-4">
+            <label for="geselecteerdeBordspellen" class="form-label">Kies Bordspellen</label>
+            <select asp-for="Bordspellen" asp-items="ViewBag.Bordspellen" class="form-control" multiple="multiple" name="geselecteerdeBordspellen">
+            </select>
+            <span asp-validation-for="Bordspellen" class="text-danger"></span>
+        </div>
+
+        <!-- Opslaan Button -->
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-save"></i> Opslaan
+            </button>
+        </div>
+       
+    </form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
