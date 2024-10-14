@@ -8,19 +8,19 @@ namespace SpelAvondApp.Domain.Models
     {
 
         [Required]
-        public string Naam { get; set; }
+        public string ?Naam { get; set; }
 
         [Required]
-        public string Geslacht { get; set; }
+        public string ?Geslacht { get; set; }
 
         [Required]
-        public string Straat { get; set; }
+        public string ?Straat { get; set; }
 
         [Required]
-        public string Huisnummer { get; set; }
+        public string ?Huisnummer { get; set; }
 
         [Required]
-        public string Stad { get; set; }
+        public string ?Stad { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
