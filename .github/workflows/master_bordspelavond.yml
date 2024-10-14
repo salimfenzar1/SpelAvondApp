@@ -61,4 +61,4 @@ jobs:
         with:
           app-name: 'bordspelavond'
           slot-name: 'Production'
-          package: .
+          package: ./
