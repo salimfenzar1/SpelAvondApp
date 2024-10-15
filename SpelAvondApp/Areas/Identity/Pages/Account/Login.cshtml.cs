@@ -103,7 +103,15 @@ namespace SpelAvondApp.Areas.Identity.Pages.Account
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
+
+
         {
+            var identityConnectionString = Environment.GetEnvironmentVariable("IDENTITY_CONNSTR");
+            var spellenDbConnectionString = Environment.GetEnvironmentVariable("SPELLEN_CONNSTR");
+
+            _logger.LogInformation("IDENTITY_CONNSTR: {IdentityConnectionString}", identityConnectionString);
+            _logger.LogInformation("SPELLEN_CONNSTR: {SpellenDbConnectionString}", spellenDbConnectionString);
+
             returnUrl ??= Url.Content("~/");
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
