@@ -23,6 +23,9 @@ var spellenDbConnectionString = isDevelopment
     ? builder.Configuration.GetConnectionString("SpellenDbConnection") // Lokale development string
     : Environment.GetEnvironmentVariable("SPELLEN_CONNSTR"); // Connection string uit Azure environment variable
 
+Console.WriteLine($"IDENTITY_CONNSTR: {identityConnectionString}");
+Console.WriteLine($"SPELLEN_CONNSTR: {spellenDbConnectionString}");
+
 if (spellenDbConnectionString == null)
     throw new InvalidOperationException("Connection string 'SPELLEN_CONNSTR' not found.");
 
