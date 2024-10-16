@@ -77,6 +77,10 @@ public class SpellenRepository : ISpellenRepository
             bestaandeAvond.MaxAantalSpelers = avond.MaxAantalSpelers;
             bestaandeAvond.Is18Plus = avond.Is18Plus;
             bestaandeAvond.OrganisatorId = avond.OrganisatorId;
+            bestaandeAvond.BiedtLactosevrijeOpties = avond.BiedtLactosevrijeOpties;
+            bestaandeAvond.BiedtNotenvrijeOpties = avond.BiedtNotenvrijeOpties;
+            bestaandeAvond.BiedtVegetarischeOpties = avond.BiedtVegetarischeOpties;
+            bestaandeAvond.BiedtAlcoholvrijeOpties = avond.BiedtAlcoholvrijeOpties;
 
             // Update bordspellen voor de avond
             bestaandeAvond.Bordspellen.Clear();
@@ -183,6 +187,14 @@ public class SpellenRepository : ISpellenRepository
             })
             .FirstOrDefaultAsync();
     }
+
+    public async Task<bool> HeeftInschrijvingOpDatumAsync(string userId, DateTime datum)
+    {
+        return await _context.Inschrijvingen
+            .Include(i => i.BordspellenAvond)
+            .AnyAsync(i => i.SpelerId == userId && i.BordspellenAvond.Datum.Date == datum.Date);
+    }
+
 
 
 

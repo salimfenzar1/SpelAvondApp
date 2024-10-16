@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SpelAvondApp.Application;
 using SpelAvondApp.Domain.Models;
 using System.Threading.Tasks;
@@ -72,5 +73,8 @@ public class InschrijvingService : IInschrijvingService
     {
         return await _repository.GetAvondMetDieetOptiesAsync(avondId);
     }
-
+    public async Task<bool> KanDeelnemenAanAvond(ApplicationUser gebruiker, DateTime avondDatum)
+    {
+        return await _repository.HeeftInschrijvingOpDatumAsync(gebruiker.Id, avondDatum);
+    }
 }

@@ -30,4 +30,6 @@ public interface ISpellenRepository
     Task<List<BordspellenAvond>> GetAvondenWaarIngeschrevenAsync(string userId);
 
     Task<BordspellenAvond> GetAvondMetDieetOptiesAsync(int avondId);
+
+    Task<bool> HeeftInschrijvingOpDatumAsync(string userId, DateTime datum);
 }
