@@ -43,6 +43,13 @@ namespace SpelAvondApp.Controllers
                 return RedirectToAction("Index", "BordspellenAvond");
             }
 
+            var heeftInschrijvingOpDatum = await _inschrijvingService.KanDeelnemenAanAvond(user, avond.Datum);
+            if (heeftInschrijvingOpDatum)
+            {
+                TempData["ErrorMessage"] = "Je kunt slechts aan één bordspellenavond per dag deelnemen.";
+                return RedirectToAction("Index", "BordspellenAvond");
+            }
+
             // Controleer of de dieetwensen van de gebruiker overeenkomen met de opties voor de avond
             if ((user.HeeftLactoseAllergie && !avond.BiedtLactosevrijeOpties) ||
                 (user.HeeftNotenAllergie && !avond.BiedtNotenvrijeOpties) ||

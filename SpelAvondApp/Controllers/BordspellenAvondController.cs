@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc;
 using SpelAvondApp.Application;
 using SpelAvondApp.Domain.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 [Authorize]
 public class BordspellenAvondController : Controller
@@ -60,24 +58,11 @@ public class BordspellenAvondController : Controller
         }
 
         model.OrganisatorId = user.Id;
-        ModelState.Remove("Organisator");
 
         if (ModelState.IsValid)
         {
             await _bordspellenAvondService.CreateBordspellenAvondAsync(model, geselecteerdeBordspellen);
             return RedirectToAction(nameof(Index));
-        }
-        else
-        {
-            // Print de ModelState-fouten naar de console
-            foreach (var modelStateKey in ModelState.Keys)
-            {
-                var modelStateVal = ModelState[modelStateKey];
-                foreach (var error in modelStateVal.Errors)
-                {
-                    Console.WriteLine($"ModelState error: Key='{modelStateKey}', Error='{error.ErrorMessage}'");
-                }
-            }
         }
 
         var bordspellen = await _bordspellenAvondService.GetAllBordspellenAsync();
@@ -89,7 +74,12 @@ public class BordspellenAvondController : Controller
     {
         var user = await _userManager.GetUserAsync(User);
         var avond = await _bordspellenAvondService.GetAvondByIdAsync(id);
-       
+
+        if (avond == null)
+        {
+            return NotFound();
+        }
+
         if (avond.Inschrijvingen.Any())
         {
             TempData["ErrorMessage"] = "Deze avond kan niet worden bewerkt omdat er al inschrijvingen zijn.";
@@ -101,22 +91,12 @@ public class BordspellenAvondController : Controller
             return Forbid();
         }
 
-      
-
-        if (avond == null)
-        {
-            return NotFound();
-        }
-
-     
         var bordspellen = await _bordspellenAvondService.GetAllBordspellenAsync();
         ViewBag.Bordspellen = new MultiSelectList(bordspellen, "Id", "Naam", avond.Bordspellen.Select(b => b.Id));
 
-        // Voeg het organisatorId toe aan het model, indien nodig.
-        avond.OrganisatorId = user.Id;
-
         return View(avond);
     }
+
     [HttpPost]
     public async Task<IActionResult> Edit(BordspellenAvond model, List<int> geselecteerdeBordspellen)
     {
@@ -147,7 +127,7 @@ public class BordspellenAvondController : Controller
 
         if (avond.Inschrijvingen.Any())
         {
-            TempData["ErrorMessage"] = "Deze avond kan niet worden verwijdert omdat er al inschrijvingen zijn.";
+            TempData["ErrorMessage"] = "Deze avond kan niet worden verwijderd omdat er al inschrijvingen zijn.";
             return RedirectToAction("Index", "BordspellenAvond");
         }
 
@@ -182,10 +162,8 @@ public class BordspellenAvondController : Controller
             avonden[i] = await _inschrijvingService.GetAvondWithInschrijvingenAndUserNamesAsync(avonden[i].Id);
         }
 
-
         return View(avonden);
     }
-
 
     public async Task<IActionResult> MijnIngeschrevenAvonden()
     {
@@ -194,6 +172,4 @@ public class BordspellenAvondController : Controller
 
         return View(ingeschrevenAvonden);
     }
-
-
 }

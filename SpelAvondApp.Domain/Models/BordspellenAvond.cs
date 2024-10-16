@@ -1,13 +1,17 @@
 ﻿using SpelAvondApp.Domain.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SpelAvondApp.Domain.Models
 {
     public class BordspellenAvond
     {
+        [Required(ErrorMessage = "De datum is verplicht.")]
         public int Id { get; set; }
         public string ?Adres { get; set; }
+        [Required(ErrorMessage = "Het adres is verplicht.")]
         public DateTime Datum { get; set; }
+        [Required(ErrorMessage = "Het maximale aantal spelers is verplicht.")]
         public int MaxAantalSpelers { get; set; }
         public bool Is18Plus { get; set; }
 
