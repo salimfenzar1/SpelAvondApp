@@ -116,11 +116,11 @@ public class SpellenRepository : ISpellenRepository
     public async Task<List<BordspellenAvond>> GetAllBordspellenAvondenAsync()
     {
         return await _context.BordspellenAvonden
-            .Include(b => b.Bordspellen) // Include de Bordspellen relatie
+            .Include(b => b.Bordspellen)  
+            .Include(b => b.Reviews)      
             .AsNoTracking()
             .ToListAsync();
     }
-
     public async Task AddInschrijvingAsync(Inschrijving inschrijving)
     {
         _context.Inschrijvingen.Add(inschrijving);
@@ -154,6 +154,7 @@ public class SpellenRepository : ISpellenRepository
         return await _context.BordspellenAvonden
             .Where(a => a.OrganisatorId == organisatorId)
             .Include(a => a.Inschrijvingen)
+            .Include(a => a.Reviews)
             .ToListAsync();
     }
 
@@ -195,7 +196,36 @@ public class SpellenRepository : ISpellenRepository
             .AnyAsync(i => i.SpelerId == userId && i.BordspellenAvond.Datum.Date == datum.Date);
     }
 
+    public async Task<double> BerekenGemiddeldeScoreOrganisatorAsync(string organisatorId)
+    {
+        var avondenMetReviews = await _context.BordspellenAvonden
+            .Where(avond => avond.OrganisatorId == organisatorId)
+            .Include(avond => avond.Reviews)
+            .ToListAsync();
 
+        var alleScores = avondenMetReviews
+            .SelectMany(avond => avond.Reviews)
+            .Select(review => review.Score)
+            .ToList();
+
+        if (alleScores.Count == 0)
+            return 0;
+
+        return alleScores.Average();
+    }
+
+    public async Task AddReviewAsync(Review review)
+    {
+        var avond = await _context.BordspellenAvonden
+            .Include(a => a.Reviews)
+            .FirstOrDefaultAsync(a => a.Id == review.BordspellenAvondId);
+
+        if (avond != null)
+        {
+            avond.Reviews.Add(review);
+            await _context.SaveChangesAsync();
+        }
+    }
 
 
 }

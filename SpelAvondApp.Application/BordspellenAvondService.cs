@@ -90,4 +90,30 @@ public class BordspellenAvondService : IBordspellenAvondService
         return avonden;
     }
 
+    public async Task<double> BerekenGemiddeldeScoreOrganisatorAsync(string organisatorId)
+    {
+        return await _repository.BerekenGemiddeldeScoreOrganisatorAsync(organisatorId);
+    }
+
+    public async Task AddReviewAsync(Review review)
+    {
+        await _repository.AddReviewAsync(review);
+    }
+    public async Task<List<Review>> GetReviewsByOrganisatorAsync(string organisatorId)
+    {
+        var avonden = await _repository.GetAvondenByOrganisatorAsync(organisatorId);
+
+        var reviews = avonden
+            .SelectMany(a => a.Reviews)
+            .ToList();
+
+        foreach (var review in reviews)
+        {
+            review.Speler = await _userManager.FindByIdAsync(review.SpelerId);
+        }
+
+        return reviews;
+    }
+
+
 }

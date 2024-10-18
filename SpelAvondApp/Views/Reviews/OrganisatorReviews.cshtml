@@ -1,0 +1,23 @@
+﻿@model IEnumerable<SpelAvondApp.Domain.Models.Review>
+
+<h2>Reviews voor organisator @ViewBag.OrganisatorNaam</h2>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-primary">
+        <tr>
+            <th>Speler</th>
+            <th>Score</th>
+            <th>Opmerking</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var review in Model)
+        {
+            <tr>
+                <td>@review.Speler?.UserName</td>
+                <td>@review.Score/5</td>
+                <td>@review.Opmerking</td>
+            </tr>
+        }
+    </tbody>
+</table>

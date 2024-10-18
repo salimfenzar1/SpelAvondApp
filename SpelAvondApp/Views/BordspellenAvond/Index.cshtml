@@ -37,6 +37,7 @@
             <th>Datum en Tijd</th>
             <th>Adres</th>
             <th>Organisator</th>
+            <th>Gemiddelde Score</th>
             <th>Max Spelers</th>
             <th>18+</th>
             <th>Bordspellen</th>
@@ -50,16 +51,26 @@
             <tr>
                 <td>@avond.Datum.ToString("dd-MM-yyyy HH:mm")</td>
                 <td>@avond.Adres</td>
-                <td>@avond.Organisator?.UserName</td>
+                <td>
+                    @avond.Organisator?.UserName
+                    <a asp-controller="Reviews" asp-action="OrganisatorReviews" asp-route-organisatorId="@avond.OrganisatorId" class="btn btn-info btn-sm">
+                        Bekijk alle reviews
+                    </a>
+                </td>
+                <td class="text-center">
+                    @(avond.GemiddeldeScore > 0 ? avond.GemiddeldeScore.ToString("0.00") : "Nog geen recensies")
+                </td>
                 <td class="text-center">@avond.MaxAantalSpelers</td>
-                <td class="text-center">@if (avond.Is18Plus)
+                <td class="text-center">
+                    @if (avond.Is18Plus)
                     {
                         <span class="badge bg-danger">Ja</span>
                     }
                     else
                     {
                         <span class="badge bg-secondary">Nee</span>
-                    }</td>
+                    }
+                </td>
                 <td>
                     @if (avond.Bordspellen != null && avond.Bordspellen.Any())
                     {
@@ -77,34 +88,26 @@
                 </td>
                 <td>
                     <ul class="list-unstyled mb-0">
-                        @{
-                            bool hasOptions = false;
+                        @if (avond.BiedtLactosevrijeOpties)
+                        {
+                            <li><i class="bi bi-droplet"></i> Lactosevrij</li>
+                        }
+                        @if (avond.BiedtNotenvrijeOpties)
+                        {
+                            <li><i class="bi bi-nut-fill"></i> Notenvrij</li>
+                        }
+                        @if (avond.BiedtVegetarischeOpties)
+                        {
+                            <li><i class="bi bi-leaf"></i> Vegetarisch</li>
+                        }
+                        @if (avond.BiedtAlcoholvrijeOpties)
+                        {
+                            <li><i class="bi bi-cup-straw"></i> Geen Alcohol</li>
+                        }
 
-                            if (avond.BiedtLactosevrijeOpties)
-                            {
-                                <li><i class="bi bi-droplet"></i> Lactosevrij</li>
-                                hasOptions = true;
-                            }
-                            if (avond.BiedtNotenvrijeOpties)
-                            {
-                                <li><i class="bi bi-nut-fill"></i> Notenvrij</li>
-                                hasOptions = true;
-                            }
-                            if (avond.BiedtVegetarischeOpties)
-                            {
-                                <li><i class="bi bi-leaf"></i> Vegetarisch</li>
-                                hasOptions = true;
-                            }
-                            if (avond.BiedtAlcoholvrijeOpties)
-                            {
-                                <li><i class="bi bi-cup-straw"></i> Geen Alcohol</li>
-                                hasOptions = true;
-                            }
-
-                            if (!hasOptions)
-                            {
-                                <li class="text-muted">Geen speciale dieetopties beschikbaar</li>
-                            }
+                        @if (!avond.BiedtLactosevrijeOpties && !avond.BiedtNotenvrijeOpties && !avond.BiedtVegetarischeOpties && !avond.BiedtAlcoholvrijeOpties)
+                        {
+                            <li class="text-muted">Geen speciale dieetopties beschikbaar</li>
                         }
                     </ul>
                 </td>
