@@ -32,6 +32,12 @@ jobs:
 
       - name: Publish Web Application
         run: dotnet publish -c Release -o ./webapp SpelAvondApp/SpelAvondApp.csproj
+     
+      - name: List WebApp Directory
+        run: dir ./webapp
+
+      - name: List API Directory
+        run: dir ./api
 
       - name: Publish API
         run: dotnet publish -c Release -o ./api SpelAvondApp.API/SpelAvondApp.API.csproj
