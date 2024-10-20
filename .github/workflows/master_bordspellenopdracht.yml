@@ -42,13 +42,14 @@ jobs:
       - name: Check API publish directory
         run: dir ./api
 
-      - name: Upload webapp artifact for deployment
+      - name: Publish WebApp Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: webapp
           path: ./webapp
 
-      - name: Upload api artifact for deployment
+          
+      - name: Publish API Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: api
@@ -93,7 +94,7 @@ jobs:
         with:
           app-name: 'bordspellenopdracht'
           slot-name: 'Production'
-          package: $(System.DefaultWorkingDirectory)/webapp
+          package: $(Pipeline.Workspace)/webapp
 
       - name: Deploy API to Azure Web App
         id: deploy-api
@@ -101,5 +102,5 @@ jobs:
         with:
           app-name: 'bordspellenopdracht'
           slot-name: 'Production'
-          package: $(System.DefaultWorkingDirectory)/api
+          package: $(Pipeline.Workspace)/api
           virtual-application: '/api'
