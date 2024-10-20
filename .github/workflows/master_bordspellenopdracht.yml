@@ -31,36 +31,35 @@ jobs:
         run: dotnet test --no-restore --verbosity normal    
 
       - name: Publish Web Application
-        run: dotnet publish -c Release -o ./webapp SpelAvondApp/SpelAvondApp.csproj
+        run: dotnet publish -c Release -o $(Build.ArtifactStagingDirectory)/webapp SpelAvondApp/SpelAvondApp.csproj
 
       - name: Publish API
-        run: dotnet publish -c Release -o ./api SpelAvondApp.API/SpelAvondApp.API.csproj
+        run: dotnet publish -c Release -o $(Build.ArtifactStagingDirectory)/api SpelAvondApp.API/SpelAvondApp.API.csproj
 
       - name: Check WebApp publish directory
-        run: dir ./webapp
+        run: Get-ChildItem $(Build.ArtifactStagingDirectory)/webapp -Recurse
 
       - name: Check API publish directory
-        run: dir ./api
+        run: Get-ChildItem $(Build.ArtifactStagingDirectory)/api -Recurse
 
       - name: Publish WebApp Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: webapp
-          path: ./webapp
+          path: $(Build.ArtifactStagingDirectory)/webapp
 
-          
       - name: Publish API Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: api
-          path: ./api
+          path: $(Build.ArtifactStagingDirectory)/api
 
   deploy:
     runs-on: windows-latest
     needs: build
     environment:
       name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+      url: ${{ steps.deploy-webapp.outputs.webapp-url }}
     permissions:
       id-token: write # This is required for requesting the JWT
 
@@ -94,7 +93,7 @@ jobs:
         with:
           app-name: 'bordspellenopdracht'
           slot-name: 'Production'
-          package: $(Pipeline.Workspace)/webapp
+          package: ./webapp
 
       - name: Deploy API to Azure Web App
         id: deploy-api
@@ -102,5 +101,5 @@ jobs:
         with:
           app-name: 'bordspellenopdracht'
           slot-name: 'Production'
-          package: $(Pipeline.Workspace)/api
+          package: ./api
           virtual-application: '/api'
