@@ -49,6 +49,17 @@ builder.Services.AddDefaultIdentity<ApplicationUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("https://bordspellenopdrachtapi.azurewebsites.net") 
+               .AllowAnyHeader()
+               .AllowAnyMethod()
+               .AllowCredentials(); 
+    });
+});
+
 // Add UserManager and other Identity services
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
 
@@ -76,7 +87,7 @@ if (app.Environment.IsDevelopment())
 
 // Configure GraphQL endpoints with Hot Chocolate
 app.UseRouting();
-
+app.UseCors();
 
 app.MapGraphQL("/api/graphql");
 
