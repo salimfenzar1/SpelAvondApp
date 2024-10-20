@@ -115,12 +115,29 @@ public class SpellenRepository : ISpellenRepository
 
     public async Task<List<BordspellenAvond>> GetAllBordspellenAvondenAsync()
     {
-        return await _context.BordspellenAvonden
-            .Include(b => b.Bordspellen)  
-            .Include(b => b.Reviews)      
+        var avonden = await _context.BordspellenAvonden
+            .Include(b => b.Bordspellen)
+            .Include(b => b.Inschrijvingen)
+            .Include(b => b.Reviews)
             .AsNoTracking()
             .ToListAsync();
+
+        foreach (var avond in avonden)
+        {
+            if (!string.IsNullOrEmpty(avond.OrganisatorId))
+            {
+                avond.Organisator = await _userManager.FindByIdAsync(avond.OrganisatorId);
+            }
+
+            foreach (var inschrijving in avond.Inschrijvingen)
+            {
+                inschrijving.Speler = await _userManager.FindByIdAsync(inschrijving.SpelerId);
+            }
+        }
+
+        return avonden;
     }
+
     public async Task AddInschrijvingAsync(Inschrijving inschrijving)
     {
         _context.Inschrijvingen.Add(inschrijving);

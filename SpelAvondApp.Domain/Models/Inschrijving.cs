@@ -18,7 +18,6 @@ namespace SpelAvondApp.Domain.Models
         [NotMapped]
         public IdentityUser ?Speler { get; set; }
 
-        // Buitenlandse sleutel naar de BordspellenAvond
         public int BordspellenAvondId { get; set; }
         public BordspellenAvond ?BordspellenAvond { get; set; }
 
