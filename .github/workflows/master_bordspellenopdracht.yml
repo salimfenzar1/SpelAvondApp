@@ -68,11 +68,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: webapp
+          path: ${{ github.workspace }}/webapp
 
       - name: Download api artifact
         uses: actions/download-artifact@v4
         with:
           name: api
+          path: ${{ github.workspace }}/api
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -82,10 +84,10 @@ jobs:
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_98496DB961F843F09F7C741857ED327C }}
 
       - name: Check WebApp after download
-        run: Get-ChildItem ./webapp -Recurse
+        run: Get-ChildItem ${{ github.workspace }}/webapp -Recurse
 
       - name: Check API after download
-        run: Get-ChildItem ./api -Recurse
+        run: Get-ChildItem ${{ github.workspace }}/api -Recurse
 
       - name: Deploy Web Application to Azure Web App
         id: deploy-webapp
@@ -93,7 +95,7 @@ jobs:
         with:
           app-name: 'bordspellenopdracht'
           slot-name: 'Production'
-          package: ./webapp
+          package: ${{ github.workspace }}/webapp
 
       - name: Deploy API to Azure Web App
         id: deploy-api
@@ -101,5 +103,5 @@ jobs:
         with:
           app-name: 'bordspellenopdracht'
           slot-name: 'Production'
-          package: ./api
+          package: ${{ github.workspace }}/api
           virtual-application: '/api'
