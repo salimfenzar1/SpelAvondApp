@@ -1,7 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy ASP.Net Core app to Azure Web App - bordspelavond
+name: Build and deploy ASP.Net Core apps to Azure Web Apps - bordspellenopdracht
 
 on:
   push:
@@ -19,13 +16,19 @@ jobs:
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.x'
+          dotnet-version: '8.x'  
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ./myapp
+      - name: Run Tests
+        run: dotnet test --no-restore --verbosity normal    
+
+      - name: dotnet publish SpelAvondApp
+        run: dotnet publish SpelAvondApp/SpelAvondApp.csproj -c Release -o ./myapp
+
+      - name: dotnet publish SpelAvondApp.API
+        run: dotnet publish SpelAvondApp.API/SpelAvondApp.API.csproj -c Release -o ./apiapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -33,14 +36,15 @@ jobs:
           name: .net-app
           path: ./myapp
 
-  deploy:
+
+  deploy-app:
     runs-on: windows-latest
     needs: build
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
+      id-token: write 
 
     steps:
       - name: Download artifact from build job
@@ -51,14 +55,16 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_54B908592A2B47B28281C4ED5343DB28 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_F5A6945BC3E14430A1FE57300F90944F }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_43087982775840CEA6B7421FF7CE9AD4 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_55F5D814DDD143608739A09DB6068299 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_03CD6B2F29934EE2BEF1BF18BC04ED5D }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_98496DB961F843F09F7C741857ED327C }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'bordspelavond'
+          app-name: 'bordspellenopdracht'
           slot-name: 'Production'
           package: .
+
+ 

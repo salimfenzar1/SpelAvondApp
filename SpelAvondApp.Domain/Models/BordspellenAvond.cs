@@ -26,5 +26,8 @@ namespace SpelAvondApp.Domain.Models
         public ICollection<Bordspel> Bordspellen { get; set; } = new List<Bordspel>();
         public ICollection<Inschrijving> Inschrijvingen { get; set; } = new List<Inschrijving>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
-    }
+        [NotMapped]
+        public double GemiddeldeScore { get; set; } 
+    
+}
 }

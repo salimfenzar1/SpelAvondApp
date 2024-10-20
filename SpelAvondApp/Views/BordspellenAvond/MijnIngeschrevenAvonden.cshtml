@@ -7,8 +7,10 @@
         <tr>
             <th>Datum en Tijd</th>
             <th>Adres</th>
+            <th>Organisator</th> 
             <th>Max Spelers</th>
             <th>18+</th>
+            <th>Acties</th>
         </tr>
     </thead>
     <tbody>
@@ -17,6 +19,7 @@
             <tr>
                 <td>@avond.Datum.ToString("dd-MM-yyyy HH:mm")</td>
                 <td>@avond.Adres</td>
+                <td>@avond.Organisator?.UserName</td> 
                 <td>@avond.MaxAantalSpelers</td>
                 <td>
                     @if (avond.Is18Plus)
@@ -27,6 +30,12 @@
                     {
                         <span class="badge bg-secondary">Nee</span>
                     }
+                </td>
+                <td>
+                    <!-- Knop om een review achter te laten -->
+                    <a asp-controller="Reviews" asp-action="Create" asp-route-bordspellenAvondId="@avond.Id" class="btn btn-primary btn-sm">
+                        <i class="bi bi-pencil"></i> Review Achterlaten
+                    </a>
                 </td>
             </tr>
         }

@@ -29,6 +29,7 @@ public class BordspellenAvondController : Controller
             {
                 var organisator = await _userManager.FindByIdAsync(avond.OrganisatorId);
                 avond.Organisator = organisator;
+                avond.GemiddeldeScore = await _bordspellenAvondService.BerekenGemiddeldeScoreOrganisatorAsync(avond.OrganisatorId);
             }
         }
 
@@ -169,6 +170,15 @@ public class BordspellenAvondController : Controller
     {
         var userId = _userManager.GetUserId(User);
         var ingeschrevenAvonden = await _bordspellenAvondService.GetAvondenWaarIngeschrevenAsync(userId);
+
+        foreach (var avond in ingeschrevenAvonden)
+        {
+            if (!string.IsNullOrEmpty(avond.OrganisatorId))
+            {
+                var organisator = await _userManager.FindByIdAsync(avond.OrganisatorId);
+                avond.Organisator = organisator;
+            }
+        }
 
         return View(ingeschrevenAvonden);
     }
