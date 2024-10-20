@@ -24,8 +24,8 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/SpelAvondApp.API
+      - name: dotnet publish SpelAvondApp.API
+        run: dotnet publish './SpelAvondApp.API/SpelAvondApp.API.csproj' -c Release -o ./apiapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
