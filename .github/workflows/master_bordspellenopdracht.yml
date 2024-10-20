@@ -93,7 +93,7 @@ jobs:
         with:
           app-name: 'bordspellenopdracht'
           slot-name: 'Production'
-          package: ./webapp
+          package: $(System.DefaultWorkingDirectory)/webapp
 
       - name: Deploy API to Azure Web App
         id: deploy-api
@@ -101,5 +101,5 @@ jobs:
         with:
           app-name: 'bordspellenopdracht'
           slot-name: 'Production'
-          package: ./api
+          package: $(System.DefaultWorkingDirectory)/api
           virtual-application: '/api'
