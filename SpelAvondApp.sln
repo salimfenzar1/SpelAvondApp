@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpelAvondApp.Domain", "Spel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpelAvondApp.Tests", "SpelAvondApp.Tests\SpelAvondApp.Tests.csproj", "{C7205AB4-FB5D-4147-A0CE-475DD9294CB5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpelAvondApp.API", "SpelAvondApp.API\SpelAvondApp.API.csproj", "{BBC6DF66-91B0-49BA-97A2-2886186DCF8C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{C7205AB4-FB5D-4147-A0CE-475DD9294CB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7205AB4-FB5D-4147-A0CE-475DD9294CB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7205AB4-FB5D-4147-A0CE-475DD9294CB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBC6DF66-91B0-49BA-97A2-2886186DCF8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBC6DF66-91B0-49BA-97A2-2886186DCF8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBC6DF66-91B0-49BA-97A2-2886186DCF8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBC6DF66-91B0-49BA-97A2-2886186DCF8C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
