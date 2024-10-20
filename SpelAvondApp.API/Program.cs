@@ -11,6 +11,12 @@ using SpelAvondApp.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.api.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.api.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddEnvironmentVariables();
+
 // Check if the application is in development or production
 var isDevelopment = builder.Environment.IsDevelopment();
 
