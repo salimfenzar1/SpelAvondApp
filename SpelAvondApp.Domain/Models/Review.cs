@@ -18,7 +18,7 @@ namespace SpelAvondApp.Domain.Models
         public string ?SpelerId { get; set; }
 
         [NotMapped]
-        public IdentityUser ?Speler { get; set; }
+        public ApplicationUser ?Speler { get; set; }
 
         public int Score { get; set; } 
         public string ?Opmerking { get; set; } 

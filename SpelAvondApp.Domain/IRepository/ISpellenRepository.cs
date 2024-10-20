@@ -32,4 +32,8 @@ public interface ISpellenRepository
     Task<BordspellenAvond> GetAvondMetDieetOptiesAsync(int avondId);
 
     Task<bool> HeeftInschrijvingOpDatumAsync(string userId, DateTime datum);
+
+    Task<double> BerekenGemiddeldeScoreOrganisatorAsync(string organisatorId);
+    Task AddReviewAsync(Review review);
+
 }

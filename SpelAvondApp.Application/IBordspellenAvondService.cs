@@ -24,4 +24,9 @@ public interface IBordspellenAvondService
     Task<List<BordspellenAvond>> GetAvondenByOrganisatorAsync(string organisatorId);
     public Task<List<BordspellenAvond>> GetAvondenWaarIngeschrevenAsync(string userId);
 
+    Task<double> BerekenGemiddeldeScoreOrganisatorAsync(string organisatorId);
+    Task AddReviewAsync(Review review);
+
+    Task<List<Review>> GetReviewsByOrganisatorAsync(string organisatorId);
+
 }

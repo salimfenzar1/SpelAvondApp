@@ -1,0 +1,16 @@
+﻿@model SpelAvondApp.Domain.Models.Review
+
+<h2>Review Achterlaten</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label for="Score">Score (1-5):</label>
+        <input type="number" class="form-control" id="Score" name="Score" min="1" max="5" required />
+    </div>
+    <div class="form-group">
+        <label for="Opmerking">Opmerking:</label>
+        <textarea class="form-control" id="Opmerking" name="Opmerking"></textarea>
+    </div>
+    <input type="hidden" asp-for="BordspellenAvondId" />
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
