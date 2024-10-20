@@ -85,9 +85,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Configure GraphQL endpoints with Hot Chocolate
-app.UseRouting();
 app.UseCors();
+app.UseRouting();
+
 
 app.MapGraphQL("/api/graphql");
 
