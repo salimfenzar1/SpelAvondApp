@@ -32,15 +32,15 @@ jobs:
 
       - name: Publish Web Application
         run: dotnet publish -c Release -o ./webapp SpelAvondApp/SpelAvondApp.csproj
-     
-      - name: List WebApp Directory
-        run: dir ./webapp
-
-      - name: List API Directory
-        run: dir ./api
 
       - name: Publish API
         run: dotnet publish -c Release -o ./api SpelAvondApp.API/SpelAvondApp.API.csproj
+
+      - name: Check WebApp publish directory
+        run: dir ./webapp
+
+      - name: Check API publish directory
+        run: dir ./api
 
       - name: Upload webapp artifact for deployment
         uses: actions/upload-artifact@v4
