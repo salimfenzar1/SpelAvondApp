@@ -81,7 +81,7 @@ jobs:
         with:
           app-name: 'bordspellenopdracht'
           slot-name: 'Production'
-          package: .
+          package: ./webapp
 
       - name: Deploy API to Azure Web App
         id: deploy-api
