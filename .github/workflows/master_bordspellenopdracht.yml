@@ -36,11 +36,6 @@ jobs:
           name: .net-app
           path: ./myapp
 
-      - name: Upload artifact for API deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: .net-api
-          path: ./apiapp
 
   deploy-app:
     runs-on: windows-latest
@@ -72,32 +67,4 @@ jobs:
           slot-name: 'Production'
           package: .
 
-  deploy-api:
-    runs-on: windows-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: .net-api
-      
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_55F5D814DDD143608739A09DB6068299 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_03CD6B2F29934EE2BEF1BF18BC04ED5D }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_98496DB961F843F09F7C741857ED327C }}
-
-      - name: Deploy API to Azure Web App
-        id: deploy-to-webapp-api
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'bordspellenopdrachtapi'
-          slot-name: 'Production'
-          package: .
+ 
