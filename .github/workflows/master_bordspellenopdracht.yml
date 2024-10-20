@@ -1,107 +1,51 @@
-name: Build and deploy ASP.Net Core app to Azure Web App - bordspellenopdracht
+deploy:
+  runs-on: windows-latest
+  needs: build
+  environment:
+    name: 'Production'
+    url: ${{ steps.deploy-webapp.outputs.webapp-url }}
+  permissions:
+    id-token: write
 
-on:
-  push:
-    branches:
-      - master
-  workflow_dispatch:
+  steps:
+    - name: Download webapp artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: webapp
+        path: ${{ github.workspace }}/deploy/webapp
 
-jobs:
-  build:
-    runs-on: windows-latest
+    - name: Download api artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: api
+        path: ${{ github.workspace }}/deploy/api
 
-    steps:
-      - uses: actions/checkout@v4
+    - name: Login to Azure
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_55F5D814DDD143608739A09DB6068299 }}
+        tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_03CD6B2F29934EE2BEF1BF18BC04ED5D }}
+        subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_98496DB961F843F09F7C741857ED327C }}
 
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.x'  
-          
-      - name: Restore NuGet packages
-        run: dotnet restore
+    - name: Check WebApp after download
+      run: Get-ChildItem ${{ github.workspace }}/deploy/webapp -Recurse
 
-      - name: Build Web Application
-        run: dotnet build --configuration Release SpelAvondApp/SpelAvondApp.csproj
+    - name: Check API after download
+      run: Get-ChildItem ${{ github.workspace }}/deploy/api -Recurse
 
-      - name: Build API Project
-        run: dotnet build --configuration Release SpelAvondApp.API/SpelAvondApp.API.csproj
+    - name: Deploy Web Application to Azure Web App
+      id: deploy-webapp
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: 'bordspellenopdracht'
+        slot-name: 'Production'
+        package: ${{ github.workspace }}/deploy/webapp
 
-      - name: Run Tests
-        run: dotnet test --no-restore --verbosity normal    
-
-      - name: Publish Web Application
-        run: dotnet publish -c Release -o ${{ github.workspace }}/webapp SpelAvondApp/SpelAvondApp.csproj
-
-      - name: Publish API
-        run: dotnet publish -c Release -o ${{ github.workspace }}/api SpelAvondApp.API/SpelAvondApp.API.csproj
-
-      - name: Check WebApp publish directory
-        run: dir ${{ github.workspace }}/webapp
-
-      - name: Check API publish directory
-        run: dir ${{ github.workspace }}/api
-
-      - name: Publish WebApp Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: webapp
-          path: ${{ github.workspace }}/webapp
-
-      - name: Publish API Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: api
-          path: ${{ github.workspace }}/api
-
-  deploy:
-    runs-on: windows-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write # This is required for requesting the JWT
-
-    steps:
-      - name: Download webapp artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: webapp
-          path: ${{ github.workspace }}/webapp
-
-      - name: Download api artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: api
-          path: ${{ github.workspace }}/api
-
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_55F5D814DDD143608739A09DB6068299 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_03CD6B2F29934EE2BEF1BF18BC04ED5D }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_98496DB961F843F09F7C741857ED327C }}
-
-      - name: Check WebApp after download
-        run: Get-ChildItem ${{ github.workspace }}/webapp -Recurse
-
-      - name: Check API after download
-        run: Get-ChildItem ${{ github.workspace }}/api -Recurse
-
-      - name: Deploy Web Application to Azure Web App
-        id: deploy-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'bordspellenopdracht'
-          slot-name: 'Production'
-          package: ${{ github.workspace }}/webapp
-
-      - name: Deploy API to Azure Web App
-        id: deploy-api
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'bordspellenopdracht'
-          slot-name: 'Production'
-          package: ${{ github.workspace }}/api
-          virtual-application: '/api'
+    - name: Deploy API to Azure Web App
+      id: deploy-api
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: 'bordspellenopdracht'
+        slot-name: 'Production'
+        package: ${{ github.workspace }}/deploy/api
+        virtual-application: '/api'
