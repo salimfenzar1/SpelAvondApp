@@ -1,6 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy ASP.Net Core app to Azure Web App - bordspellenopdracht
 
 on:
@@ -21,20 +18,33 @@ jobs:
         with:
           dotnet-version: '8.x'  
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+      - name: Build Web Application
+        run: dotnet build --configuration Release SpelAvondApp/SpelAvondApp.csproj
+
+      - name: Build API Project
+        run: dotnet build --configuration Release SpelAvondApp.API/SpelAvondApp.API.csproj
 
       - name: Run Tests
         run: dotnet test --no-restore --verbosity normal    
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ./myapp
+      - name: Publish Web Application
+        run: dotnet publish -c Release -o ./webapp SpelAvondApp/SpelAvondApp.csproj
 
-      - name: Upload artifact for deployment job
+      - name: Publish API
+        run: dotnet publish -c Release -o ./api SpelAvondApp.API/SpelAvondApp.API.csproj
+
+      - name: Upload webapp artifact for deployment
         uses: actions/upload-artifact@v4
         with:
-          name: .net-app
-          path: ./myapp
+          name: webapp
+          path: ./webapp
+
+      - name: Upload api artifact for deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: api
+          path: ./api
+
   deploy:
     runs-on: windows-latest
     needs: build
@@ -42,14 +52,19 @@ jobs:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write #This is required for requesting the JWT
+      id-token: write # This is required for requesting the JWT
 
     steps:
-      - name: Download artifact from build job
+      - name: Download webapp artifact
         uses: actions/download-artifact@v4
         with:
-          name: .net-app
-      
+          name: webapp
+
+      - name: Download api artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: api
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -57,11 +72,19 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_03CD6B2F29934EE2BEF1BF18BC04ED5D }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_98496DB961F843F09F7C741857ED327C }}
 
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
+      - name: Deploy Web Application to Azure Web App
+        id: deploy-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'bordspellenopdracht'
           slot-name: 'Production'
           package: .
-          
+
+      - name: Deploy API to Azure Web App
+        id: deploy-api
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'bordspellenopdracht'
+          slot-name: 'Production'
+          package: ./api
+          virtual-application: '/api'
