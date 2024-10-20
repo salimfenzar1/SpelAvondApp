@@ -31,28 +31,28 @@ jobs:
         run: dotnet test --no-restore --verbosity normal    
 
       - name: Publish Web Application
-        run: dotnet publish -c Release -o $(Build.ArtifactStagingDirectory)/webapp SpelAvondApp/SpelAvondApp.csproj
+        run: dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/webapp SpelAvondApp/SpelAvondApp.csproj
 
       - name: Publish API
-        run: dotnet publish -c Release -o $(Build.ArtifactStagingDirectory)/api SpelAvondApp.API/SpelAvondApp.API.csproj
+        run: dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/api SpelAvondApp.API/SpelAvondApp.API.csproj
 
       - name: Check WebApp publish directory
-        run: Get-ChildItem $(Build.ArtifactStagingDirectory)/webapp -Recurse
+        run: dir $(System.DefaultWorkingDirectory)/webapp
 
       - name: Check API publish directory
-        run: Get-ChildItem $(Build.ArtifactStagingDirectory)/api -Recurse
+        run: dir $(System.DefaultWorkingDirectory)/api
 
       - name: Publish WebApp Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: webapp
-          path: $(Build.ArtifactStagingDirectory)/webapp
+          path: $(System.DefaultWorkingDirectory)/webapp
 
       - name: Publish API Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: api
-          path: $(Build.ArtifactStagingDirectory)/api
+          path: $(System.DefaultWorkingDirectory)/api
 
   deploy:
     runs-on: windows-latest
