@@ -89,7 +89,7 @@ jobs:
         with:
           app-name: 'bordspellenopdracht'
           slot-name: 'Production'
-          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/webapp
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/
 
       - name: Deploy API to Azure Web App
         id: deploy-api
