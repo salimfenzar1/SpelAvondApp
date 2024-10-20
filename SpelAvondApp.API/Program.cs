@@ -78,7 +78,7 @@ if (app.Environment.IsDevelopment())
 app.UseRouting();
 
 
-app.MapGraphQL("/graphql");
+app.MapGraphQL("/api/graphql");
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
