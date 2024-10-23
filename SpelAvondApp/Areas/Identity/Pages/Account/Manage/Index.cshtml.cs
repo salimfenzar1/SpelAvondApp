@@ -79,14 +79,17 @@ namespace SpelAvondApp.Areas.Identity.Pages.Account.Manage
                 Straat = user.Straat,
                 Huisnummer = user.Huisnummer,
                 Stad = user.Stad,
-                Geboortedatum = user.Geboortedatum,
                 HeeftLactoseAllergie = user.HeeftLactoseAllergie,
                 HeeftNotenAllergie = user.HeeftNotenAllergie,
                 IsVegetarisch = user.IsVegetarisch,
                 GeenAlcohol = user.GeenAlcohol
             };
+            if (user.Geboortedatum.HasValue)
+                {
+                    Input.Geboortedatum = user.Geboortedatum.Value;
+                }
 
-            Username = userName;
+             Username = userName;
         }
 
 

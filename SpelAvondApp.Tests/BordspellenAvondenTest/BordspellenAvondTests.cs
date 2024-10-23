@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using SpelAvondApp.Application;
+using SpelAvondApp.Controllers;
 using SpelAvondApp.Domain.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,6 +65,7 @@ namespace SpelAvondApp.Tests.BordspellenAvondenTest
             Assert.IsTrue(model.Any(a => a.OrganisatorId == "user1"));
             Assert.IsTrue(model.Any(a => a.OrganisatorId == "user2"));
         }
+        //user story 1
 
         [TestMethod]
         public async Task BeheerdersOverzicht_Geeft_GeorganiseerdeAVondenTerug()
@@ -172,17 +176,289 @@ namespace SpelAvondApp.Tests.BordspellenAvondenTest
             Assert.IsNotNull(model);
             Assert.AreEqual(0, model.Count, "Expected no organized avonden for the user.");
         }
-
+     
         [TestMethod]
-        public async Task MijnIngeschrevenAvonden_NoJoinedAvonden_ReturnsEmptyList()
+        public async Task GeenAvonden_Returns_EmptyList()
         {
-            _avondServiceMock.Setup(s => s.GetAvondenWaarIngeschrevenAsync(_user.Id)).ReturnsAsync(new List<BordspellenAvond>());
+            // Arrange
+            _avondServiceMock.Setup(s => s.GetAllAvondenAsync()).ReturnsAsync(new List<BordspellenAvond>());
 
-            var result = await _controller.MijnIngeschrevenAvonden() as ViewResult;
+            // Act
+            var result = await _controller.Index() as ViewResult;
             var model = result?.Model as List<BordspellenAvond>;
 
+            // Assert
             Assert.IsNotNull(model);
-            Assert.AreEqual(0, model.Count, "Expected no joined avonden for the user.");
+            Assert.AreEqual(0, model.Count);
         }
+
+        //user story 2
+        [TestMethod]
+        public async Task Create_New_BordspellenAvond_Success()
+        {
+            // Arrange
+            var user = new ApplicationUser { Id = "user1", UserName = "testorganizer", Geboortedatum = new DateTime(2000,1,1) };
+            var avond = new BordspellenAvond
+            {
+                Id = 1,
+                OrganisatorId = user.Id,
+                Adres = "Teststraat 123",
+                MaxAantalSpelers = 5,
+                Datum = DateTime.Now,
+                Is18Plus = false,
+                BiedtLactosevrijeOpties = false,
+                BiedtNotenvrijeOpties = true,
+                BiedtVegetarischeOpties = true,
+                BiedtAlcoholvrijeOpties = true
+            };
+
+            _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(user);
+            _avondServiceMock.Setup(s => s.IsUserEligibleToOrganizeAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(true);
+            _avondServiceMock.Setup(s => s.CreateBordspellenAvondAsync(avond, It.IsAny<List<int>>())).Returns(Task.CompletedTask);
+
+            // Act
+            var result = await _controller.Create(avond, new List<int> { 1, 2 }) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Index", result.ActionName);
+            _avondServiceMock.Verify(s => s.CreateBordspellenAvondAsync(It.IsAny<BordspellenAvond>(), It.IsAny<List<int>>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task Edit_BordspellenAvond_Success_When_NoInschrijvingen()
+        {
+            // Arrange
+            var user = new ApplicationUser { Id = "user1", UserName = "testorganizer" };
+            var avond = new BordspellenAvond
+            {
+                Id = 1,
+                OrganisatorId = user.Id,
+                Inschrijvingen = new List<Inschrijving>()
+            };
+
+            _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(user);
+            _avondServiceMock.Setup(s => s.GetAvondByIdAsync(avond.Id)).ReturnsAsync(avond);
+            _avondServiceMock.Setup(s => s.UpdateBordspellenAvondAsync(avond, It.IsAny<List<int>>())).Returns(Task.CompletedTask);
+            _avondServiceMock.Setup(s => s.UserCanEditOrDeleteAsync(avond.Id, user.Id)).ReturnsAsync(true);
+            _avondServiceMock.Setup(s => s.GetAllBordspellenAsync()).ReturnsAsync(new List<Bordspel>
+            {
+                new Bordspel { Id = 1, Naam = "Catan" },
+                new Bordspel { Id = 2, Naam = "Risk" }
+            });
+
+            // Act
+            var result = await _controller.Edit(avond.Id) as ViewResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            _avondServiceMock.Verify(s => s.GetAvondByIdAsync(avond.Id), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task Delete_BordspellenAvond_Success_When_NoInschrijvingen()
+        {
+            // Arrange
+            var user = new ApplicationUser { Id = "user1", UserName = "testorganizer" };
+            var avond = new BordspellenAvond
+            {
+                Id = 1,
+                OrganisatorId = user.Id,
+                Inschrijvingen = new List<Inschrijving>()
+            };
+
+            _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(user);
+            _avondServiceMock.Setup(s => s.GetAvondByIdAsync(avond.Id)).ReturnsAsync(avond);
+            _avondServiceMock.Setup(s => s.DeleteBordspellenAvondAsync(avond.Id)).Returns(Task.CompletedTask);
+            _avondServiceMock.Setup(s => s.UserCanEditOrDeleteAsync(avond.Id, user.Id)).ReturnsAsync(true);
+
+            // Act
+            var result = await _controller.DeleteConfirmed(avond.Id) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Index", result.ActionName);
+            _avondServiceMock.Verify(s => s.DeleteBordspellenAvondAsync(avond.Id), Times.Once);
+        }
+
+        //Foutscenario's
+
+        [TestMethod]
+        public async Task Edit_BordspellenAvond_Fails_When_Inschrijvingen_Exist()
+        {
+            // Arrange
+            var user = new ApplicationUser { Id = "user1", UserName = "testorganizer" };
+            var avond = new BordspellenAvond
+            {
+                Id = 1,
+                OrganisatorId = user.Id,
+                Inschrijvingen = new List<Inschrijving> { new Inschrijving() } // Er zijn inschrijvingen
+            };
+
+            _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(user);
+            _avondServiceMock.Setup(s => s.GetAvondByIdAsync(avond.Id)).ReturnsAsync(avond);
+            var tempDataMock = new Mock<ITempDataDictionary>();
+            _controller.TempData = tempDataMock.Object;
+
+            var result = await _controller.Edit(avond.Id) as RedirectToActionResult;
+        
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Index", result.ActionName);
+            tempDataMock.VerifySet(tempData => tempData["ErrorMessage"] = "Deze avond kan niet worden bewerkt omdat er al inschrijvingen zijn.");
+        }
+        [TestMethod]
+        public async Task Delete_BordspellenAvond_Fails_When_Inschrijvingen_Exist()
+        {
+            // Arrange
+            var user = new ApplicationUser { Id = "user1", UserName = "testorganizer" };
+            var avond = new BordspellenAvond
+            {
+                Id = 1,
+                OrganisatorId = user.Id,
+                Inschrijvingen = new List<Inschrijving> { new Inschrijving() } // Er zijn inschrijvingen
+            };
+
+            _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(user);
+            _avondServiceMock.Setup(s => s.GetAvondByIdAsync(avond.Id)).ReturnsAsync(avond);
+            var tempDataMockDelete = new Mock<ITempDataDictionary>();
+            _controller.TempData = tempDataMockDelete.Object;
+
+            // Act
+            var result = await _controller.Delete(avond.Id) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Index", result.ActionName);
+            tempDataMockDelete.VerifySet(tempData => tempData["ErrorMessage"] = "Deze avond kan niet worden verwijderd omdat er al inschrijvingen zijn.");
+
+        }
+
+        //User Story 3
+        [TestMethod]
+        public async Task Minderjarige_Speler_Kan_Deelnemen_Aan_Niet_18Plus_Avond()
+        {
+            // Arrange
+            var user = new ApplicationUser { Id = "user1", UserName = "testplayer", Geboortedatum = new DateTime(2010, 1, 1) }; // Minderjarig
+            var avond = new BordspellenAvond
+            {
+                Id = 1,
+                Is18Plus = false, // Niet 18+
+                MaxAantalSpelers = 5,
+                Bordspellen = new List<Bordspel> { new Bordspel { Id = 1, Naam = "Catan", Is18Plus = false }
+                }
+            };
+
+            _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(user);
+            _inschrijvingServiceMock.Setup(s => s.GetAvondMetDieetOptiesAsync(avond.Id)).ReturnsAsync(avond);
+            _inschrijvingServiceMock.Setup(s => s.InschrijvenVoorAvondAsync(user.Id, avond.Id, It.IsAny<string>())).ReturnsAsync(true);
+            var tempDataMock = new Mock<ITempDataDictionary>();
+
+            var inschrijvingenController = new InschrijvingenController(_inschrijvingServiceMock.Object, _userManagerMock.Object)
+            {
+                TempData = tempDataMock.Object // Mock TempData
+            };
+
+            // Act
+            var result = await inschrijvingenController.Inschrijven(avond.Id) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Index", result.ActionName);
+            tempDataMock.VerifySet(tempData => tempData["SuccessMessage"] = "Je bent succesvol ingeschreven voor de bordspellenavond!", Times.Once);
+
+            // Verify inschrijving service call
+            _inschrijvingServiceMock.Verify(s => s.InschrijvenVoorAvondAsync(user.Id, avond.Id, "Geen specifieke dieetwensen"), Times.Once);
+        }
+        [TestMethod]
+        public async Task Volwassene_Speler_Kan_Deelnemen_Aan_18Plus_Avond()
+        {
+            // Arrange
+            var user = new ApplicationUser { Id = "user2", UserName = "testadult", Geboortedatum = new DateTime(1990, 1, 1) }; // Volwassen
+            var avond = new BordspellenAvond
+            {
+                Id = 2,
+                Is18Plus = true, // 18+ avond
+                Bordspellen = new List<Bordspel> { new Bordspel { Id = 1, Naam = "Cards Against Humanity", Is18Plus = true } }
+            };
+
+            _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(user);
+            _inschrijvingServiceMock.Setup(s => s.GetAvondMetDieetOptiesAsync(avond.Id)).ReturnsAsync(avond);
+            _inschrijvingServiceMock.Setup(s => s.InschrijvenVoorAvondAsync(user.Id, avond.Id, It.IsAny<string>())).ReturnsAsync(true);
+            var tempDataMock = new Mock<ITempDataDictionary>();
+            var inschrijvingenController = new InschrijvingenController(_inschrijvingServiceMock.Object, _userManagerMock.Object)
+            {
+                TempData = tempDataMock.Object 
+            };
+
+
+            // Act
+            var result = await inschrijvingenController.Inschrijven(avond.Id) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Index", result.ActionName);
+            tempDataMock.VerifySet(tempData => tempData["SuccessMessage"] = "Je bent succesvol ingeschreven voor de bordspellenavond!", Times.Once);
+            _inschrijvingServiceMock.Verify(s => s.InschrijvenVoorAvondAsync(user.Id, avond.Id, "Geen specifieke dieetwensen"), Times.Once);
+
+        }
+        //Fout scenario's
+        [TestMethod]
+        public async Task Minderjarige_Speler_Kan_Niet_Deelnemen_Aan_18Plus_Avond()
+        {
+            // Arrange
+            var user = new ApplicationUser { Id = "user3", UserName = "testminor", Geboortedatum = new DateTime(2010, 1, 1) }; // Minderjarig
+            var avond = new BordspellenAvond
+            {
+                Id = 3,
+                Is18Plus = true, // 18+ avond
+                Bordspellen = new List<Bordspel> { new Bordspel { Id = 1, Naam = "Cards Against Humanity", Is18Plus = true } }
+            };
+
+            _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(user);
+            _inschrijvingServiceMock.Setup(s => s.GetAvondMetDieetOptiesAsync(avond.Id)).ReturnsAsync(avond);
+            var tempDataMock = new Mock<ITempDataDictionary>();
+
+            var inschrijvingenController = new InschrijvingenController(_inschrijvingServiceMock.Object, _userManagerMock.Object)
+            {
+                TempData = tempDataMock.Object
+            };
+
+            // Act
+            var result = await inschrijvingenController.Inschrijven(avond.Id) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Index", result.ActionName);
+            tempDataMock.VerifySet(tempData => tempData["ErrorMessage"] = "Je bent niet oud genoeg om deel te nemen aan deze 18+ bordspellenavond.", Times.Once);
+        }
+
+        [TestMethod]
+        public async Task Organisator_Kan_Geen_Niet_18Plus_Avond_Maken_Met_18Plus_Spel()
+        {
+            // Arrange
+            var avond = new BordspellenAvond
+            {
+                Id = 4,
+                Is18Plus = false, 
+                Bordspellen = new List<Bordspel> { new Bordspel { Id = 1, Naam = "Cards Against Humanity", Is18Plus = true } } 
+            };
+
+            _avondServiceMock.Setup(s => s.CreateBordspellenAvondAsync(It.IsAny<BordspellenAvond>(), It.IsAny<List<int>>())).Returns(Task.CompletedTask);
+            _avondServiceMock.Setup(s => s.IsUserEligibleToOrganizeAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(true);
+            var tempDataMock = new Mock<ITempDataDictionary>();
+            _controller.TempData = tempDataMock.Object;
+
+            // Act
+            var result = await _controller.Create(avond, new List<int> { 1 }) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            tempDataMock.VerifySet(tempData => tempData["ErrorMessage"] = "Je kunt geen niet-18+ avond aanmaken met een 18+ spel.", Times.Once);
+
+        }
+
+
+        //User story 4
+
     }
 }

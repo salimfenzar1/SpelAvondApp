@@ -24,13 +24,19 @@ namespace SpelAvondApp.Domain.Models
 
         [Required]
         [DataType(DataType.Date)]
-        public DateTime Geboortedatum { get; set; }
+        public DateTime? Geboortedatum { get; set; }
 
         public bool IsVolwassen
         {
             get
             {
-                return DateTime.Now.Year - Geboortedatum.Year >= 18;
+                if (Geboortedatum.HasValue)
+                {
+                    var leeftijd = DateTime.Now.Year - Geboortedatum.Value.Year;
+                    if (Geboortedatum.Value > DateTime.Now.AddYears(-leeftijd)) leeftijd--;
+                    return leeftijd >= 18;
+                }
+                return false; 
             }
         }
         public bool HeeftLactoseAllergie { get; set; }

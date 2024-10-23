@@ -14,5 +14,6 @@ namespace SpelAvondApp.Application
         Task<BordspellenAvond> GetAvondWithInschrijvingenAndUserNamesAsync(int avondId);
         Task<BordspellenAvond> GetAvondMetDieetOptiesAsync(int avondId);
         Task<bool> KanDeelnemenAanAvond(ApplicationUser gebruiker, DateTime avondDatum);
+        Task<bool> MagDeelnemenOpBasisVanLeeftijdAsync(string userId, int avondId);
     }
 }
