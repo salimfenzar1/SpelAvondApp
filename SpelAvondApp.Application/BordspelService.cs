@@ -17,11 +17,21 @@ public class BordspelService : IBordspelService
 
     public async Task<bool> IsUserEligibleToCreateBordspel(ApplicationUser user)
     {
+        if (!user.Geboortedatum.HasValue)
+        {
+            return false; 
+        }
+
         var today = DateTime.Today;
-        var age = today.Year - user.Geboortedatum.Year;
-        if (user.Geboortedatum.Date > today.AddYears(-age)) age--;
+        var geboortedatum = user.Geboortedatum.Value;
+
+        var age = today.Year - geboortedatum.Year;
+
+        if (geboortedatum > today.AddYears(-age)) age--;
+
         return age >= 18;
     }
+
 
     public async Task AddBordspelAsync(Bordspel bordspel)
     {

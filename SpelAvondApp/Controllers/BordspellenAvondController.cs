@@ -50,12 +50,21 @@ public class BordspellenAvondController : Controller
 
         if (user == null)
         {
-            return BadRequest("Er is geen geregistreerde gebruiker gevonden.");
+            TempData["ErrorMessage"] = "Er is geen geregistreerde gebruiker gevonden.";
+            return RedirectToAction(nameof(Create));
         }
 
         if (!await _bordspellenAvondService.IsUserEligibleToOrganizeAsync(user))
         {
-            return BadRequest("Je moet minimaal 18 jaar oud zijn om een bordspellenavond te organiseren.");
+            TempData["ErrorMessage"] = "Je moet minimaal 18 jaar oud zijn om een bordspellenavond te organiseren.";
+            return RedirectToAction(nameof(Create));
+        }
+
+        var isValid = await _bordspellenAvondService.ValidateBordspellenAvond(model, geselecteerdeBordspellen);
+        if (!isValid)
+        {
+            TempData["ErrorMessage"] = "Je kunt geen niet-18+ avond aanmaken met een 18+ spel.";
+            return RedirectToAction(nameof(Create));
         }
 
         model.OrganisatorId = user.Id;
@@ -63,6 +72,7 @@ public class BordspellenAvondController : Controller
         if (ModelState.IsValid)
         {
             await _bordspellenAvondService.CreateBordspellenAvondAsync(model, geselecteerdeBordspellen);
+            TempData["SuccessMessage"] = "De bordspellenavond is succesvol aangemaakt.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -70,6 +80,7 @@ public class BordspellenAvondController : Controller
         ViewBag.Bordspellen = new MultiSelectList(bordspellen, "Id", "Naam");
         return View(model);
     }
+
 
     public async Task<IActionResult> Edit(int id)
     {

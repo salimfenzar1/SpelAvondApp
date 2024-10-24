@@ -17,11 +17,17 @@ public class BordspellenAvondService : IBordspellenAvondService
 
     public async Task<bool> IsUserEligibleToOrganizeAsync(ApplicationUser user)
     {
+        if (!user.Geboortedatum.HasValue) return false;
+
         var today = DateTime.Today;
-        var age = today.Year - user.Geboortedatum.Year;
-        if (user.Geboortedatum.Date > today.AddYears(-age)) age--;
+        var geboortedatum = user.Geboortedatum.Value; 
+
+        var age = today.Year - geboortedatum.Year;
+        if (geboortedatum > today.AddYears(-age)) age--;
+
         return age >= 18;
     }
+
 
     public async Task CreateBordspellenAvondAsync(BordspellenAvond avond, List<int> geselecteerdeBordspellenIds)
     {
@@ -113,6 +119,18 @@ public class BordspellenAvondService : IBordspellenAvondService
         }
 
         return reviews;
+    }
+
+    public async Task<bool> ValidateBordspellenAvond(BordspellenAvond model, List<int> geselecteerdeBordspellen)
+    {
+        var geselecteerdeSpellen = await _repository.GetBordspellenByIdsAsync(geselecteerdeBordspellen);
+
+        if (!model.Is18Plus && geselecteerdeSpellen.Any(s => s.Is18Plus))
+        {
+            return false; 
+        }
+
+        return true; 
     }
 
 

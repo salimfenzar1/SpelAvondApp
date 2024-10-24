@@ -50,7 +50,13 @@ namespace SpelAvondApp.Controllers
                 return RedirectToAction("Index", "BordspellenAvond");
             }
 
-            // Controleer of de dieetwensen van de gebruiker overeenkomen met de opties voor de avond
+            var magDeelnemen = await _inschrijvingService.MagDeelnemenOpBasisVanLeeftijdAsync(user.Id, avondId);
+            if (!magDeelnemen)
+            {
+                TempData["ErrorMessage"] = "Je bent niet oud genoeg om deel te nemen aan deze 18+ bordspellenavond.";
+                return RedirectToAction("Index", "BordspellenAvond");
+            }
+
             if ((user.HeeftLactoseAllergie && !avond.BiedtLactosevrijeOpties) ||
                 (user.HeeftNotenAllergie && !avond.BiedtNotenvrijeOpties) ||
                 (user.IsVegetarisch && !avond.BiedtVegetarischeOpties) ||
