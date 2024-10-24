@@ -78,21 +78,21 @@ public class InschrijvingService : IInschrijvingService
         return await _repository.HeeftInschrijvingOpDatumAsync(gebruiker.Id, avondDatum);
     }
     public async Task<bool> MagDeelnemenOpBasisVanLeeftijdAsync(string userId, int avondId)
+{
+    var user = await _userManager.FindByIdAsync(userId);
+    if (user == null || !user.Geboortedatum.HasValue) return false;
+
+    var avond = await _repository.GetBordspellenAvondByIdAsync(avondId);
+    if (avond == null) return false;
+
+    if (avond.Is18Plus)
     {
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null || !user.Geboortedatum.HasValue) return false;
+        var leeftijd = DateTime.Now.Year - user.Geboortedatum.Value.Year;
+        if (user.Geboortedatum > DateTime.Now.AddYears(-leeftijd)) leeftijd--;
 
-        var avond = await _repository.GetBordspellenAvondByIdAsync(avondId);
-        if (avond == null) return false;
-
-        if (avond.Is18Plus)
-        {
-            var leeftijd = DateTime.Now.Year - user.Geboortedatum.Value.Year;
-            if (user.Geboortedatum > DateTime.Now.AddYears(-leeftijd)) leeftijd--;
-
-            return leeftijd >= 18;
-        }
-
-        return true; // Als het geen 18+ avond is, mag iedereen meedoen
+        return leeftijd >= 18;
     }
+
+    return true; // Als het geen 18+ avond is, mag iedereen meedoen
+}
 }
