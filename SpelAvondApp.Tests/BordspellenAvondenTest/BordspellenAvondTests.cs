@@ -21,6 +21,7 @@ namespace SpelAvondApp.Tests.BordspellenAvondenTest
         private Mock<IInschrijvingService> _inschrijvingServiceMock;
         private Mock<UserManager<ApplicationUser>> _userManagerMock;
         private BordspellenAvondController _controller;
+        private InschrijvingenController _inschrijvingController;
         private ApplicationUser _user;
 
         [TestInitialize]
@@ -36,6 +37,7 @@ namespace SpelAvondApp.Tests.BordspellenAvondenTest
             _userManagerMock.Setup(um => um.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns(_user.Id);
 
             _controller = new BordspellenAvondController(_avondServiceMock.Object, _userManagerMock.Object, _inschrijvingServiceMock.Object);
+            _inschrijvingController = new InschrijvingenController(_inschrijvingServiceMock.Object, _userManagerMock.Object);
         }
 
         private Mock<UserManager<ApplicationUser>> MockUserManager()
@@ -214,7 +216,11 @@ namespace SpelAvondApp.Tests.BordspellenAvondenTest
 
             _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(user);
             _avondServiceMock.Setup(s => s.IsUserEligibleToOrganizeAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(true);
-            _avondServiceMock.Setup(s => s.CreateBordspellenAvondAsync(avond, It.IsAny<List<int>>())).Returns(Task.CompletedTask);
+            _avondServiceMock.Setup(s => s.CreateBordspellenAvondAsync(avond, It.IsAny<List<int>>())).Returns(Task.CompletedTask); 
+            _avondServiceMock.Setup(s => s.ValidateBordspellenAvond(avond, It.IsAny<List<int>>())).ReturnsAsync(true);
+
+            var tempDataMock = new Mock<ITempDataDictionary>();
+            _controller.TempData = tempDataMock.Object;
 
             // Act
             var result = await _controller.Create(avond, new List<int> { 1, 2 }) as RedirectToActionResult;
@@ -223,6 +229,8 @@ namespace SpelAvondApp.Tests.BordspellenAvondenTest
             Assert.IsNotNull(result);
             Assert.AreEqual("Index", result.ActionName);
             _avondServiceMock.Verify(s => s.CreateBordspellenAvondAsync(It.IsAny<BordspellenAvond>(), It.IsAny<List<int>>()), Times.Once);
+            tempDataMock.VerifySet(tempData => tempData["SuccessMessage"] = "De bordspellenavond is succesvol aangemaakt.");
+
         }
 
         [TestMethod]
@@ -338,7 +346,7 @@ namespace SpelAvondApp.Tests.BordspellenAvondenTest
         public async Task Minderjarige_Speler_Kan_Deelnemen_Aan_Niet_18Plus_Avond()
         {
             // Arrange
-            var user = new ApplicationUser { Id = "user1", UserName = "testplayer", Geboortedatum = new DateTime(2010, 1, 1) }; // Minderjarig
+            var user = new ApplicationUser { Id = "user1", UserName = "testplayer", Geboortedatum = new DateTime(2007, 1, 1) }; // Minderjarig
             var avond = new BordspellenAvond
             {
                 Id = 1,
@@ -350,12 +358,13 @@ namespace SpelAvondApp.Tests.BordspellenAvondenTest
 
             _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(user);
             _inschrijvingServiceMock.Setup(s => s.GetAvondMetDieetOptiesAsync(avond.Id)).ReturnsAsync(avond);
-            _inschrijvingServiceMock.Setup(s => s.InschrijvenVoorAvondAsync(user.Id, avond.Id, It.IsAny<string>())).ReturnsAsync(true);
+            _inschrijvingServiceMock.Setup(s => s.InschrijvenVoorAvondAsync(user.Id, avond.Id, It.IsAny<string>())).ReturnsAsync(true); 
+                _inschrijvingServiceMock.Setup(s => s.MagDeelnemenOpBasisVanLeeftijdAsync(user.Id, avond.Id)).ReturnsAsync(true);
             var tempDataMock = new Mock<ITempDataDictionary>();
 
             var inschrijvingenController = new InschrijvingenController(_inschrijvingServiceMock.Object, _userManagerMock.Object)
             {
-                TempData = tempDataMock.Object // Mock TempData
+                TempData = tempDataMock.Object 
             };
 
             // Act
@@ -384,6 +393,8 @@ namespace SpelAvondApp.Tests.BordspellenAvondenTest
             _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(user);
             _inschrijvingServiceMock.Setup(s => s.GetAvondMetDieetOptiesAsync(avond.Id)).ReturnsAsync(avond);
             _inschrijvingServiceMock.Setup(s => s.InschrijvenVoorAvondAsync(user.Id, avond.Id, It.IsAny<string>())).ReturnsAsync(true);
+            _inschrijvingServiceMock.Setup(s => s.MagDeelnemenOpBasisVanLeeftijdAsync(user.Id, avond.Id)).ReturnsAsync(true);
+
             var tempDataMock = new Mock<ITempDataDictionary>();
             var inschrijvingenController = new InschrijvingenController(_inschrijvingServiceMock.Object, _userManagerMock.Object)
             {
@@ -459,6 +470,96 @@ namespace SpelAvondApp.Tests.BordspellenAvondenTest
 
 
         //User story 4
+        [TestMethod]
+        public async Task Speler_Kan_Inschrijven_Als_Spelavond_Niet_Vol_Is()
+        {
+            // Arrange
+            var user = new ApplicationUser { Id = "user1", UserName = "testplayer", Geboortedatum = new DateTime(2000, 1, 1) }; // 24 jaar oud
+            var avond = new BordspellenAvond
+            {
+                Id = 1,
+                MaxAantalSpelers = 5,
+                Inschrijvingen = new List<Inschrijving>(), // Nog geen inschrijvingen
+                Is18Plus = false
+            };
 
+            _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(user);
+            _inschrijvingServiceMock.Setup(s => s.GetAvondMetDieetOptiesAsync(avond.Id)).ReturnsAsync(avond);
+            _inschrijvingServiceMock.Setup(s => s.InschrijvenVoorAvondAsync(user.Id, avond.Id, "Geen specifieke dieetwensen")).ReturnsAsync(true);
+            _inschrijvingServiceMock.Setup(s => s.MagDeelnemenOpBasisVanLeeftijdAsync(user.Id, avond.Id)).ReturnsAsync(true); // Correcte mock
+
+
+            var tempDataMock = new Mock<ITempDataDictionary>();
+            _inschrijvingController.TempData = tempDataMock.Object;
+
+            // Act
+            var result = await _inschrijvingController.Inschrijven(avond.Id) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Index", result.ActionName);
+            tempDataMock.VerifySet(tempData => tempData["SuccessMessage"] = "Je bent succesvol ingeschreven voor de bordspellenavond!", Times.Once);
+            _inschrijvingServiceMock.Verify(s => s.InschrijvenVoorAvondAsync(user.Id, avond.Id, "Geen specifieke dieetwensen"), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task Speler_Kan_Niet_Inschrijven_Als_Spelavond_Vol_Is()
+        {
+            // Arrange
+            var user = new ApplicationUser { Id = "user1", UserName = "testplayer", Geboortedatum = new DateTime(2000, 1, 1) };
+            var avond = new BordspellenAvond
+            {
+                Id = 1,
+                MaxAantalSpelers = 5,
+                Inschrijvingen = new List<Inschrijving> { new Inschrijving(), new Inschrijving(), new Inschrijving(), new Inschrijving(), new Inschrijving() }, // Vol
+                Is18Plus = false
+            };
+
+            _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(user);
+            _inschrijvingServiceMock.Setup(s => s.GetAvondMetDieetOptiesAsync(avond.Id)).ReturnsAsync(avond);
+            _inschrijvingServiceMock.Setup(s => s.MagDeelnemenOpBasisVanLeeftijdAsync(user.Id, avond.Id)).ReturnsAsync(true);
+
+            var tempDataMock = new Mock<ITempDataDictionary>();
+            _inschrijvingController.TempData = tempDataMock.Object;
+
+            // Act
+            var result = await _inschrijvingController.Inschrijven(avond.Id) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Index", result.ActionName);
+            tempDataMock.VerifySet(tempData => tempData["ErrorMessage"] = "Inschrijving mislukt. Mogelijk is het maximale aantal spelers al bereikt.", Times.Once);
+        }
+        [TestMethod]
+        public async Task Speler_Kan_Niet_Meerdere_Avonden_Op_Dezelfde_Dag_Inschrijven()
+        {
+            // Arrange
+            var user = new ApplicationUser { Id = "user1", UserName = "testplayer", Geboortedatum = new DateTime(2000, 1, 1) };
+            var avond = new BordspellenAvond
+            {
+                Id = 1,
+                MaxAantalSpelers = 5,
+                Is18Plus = false,
+                Datum = DateTime.Today
+            };
+
+            _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(user);
+            _inschrijvingServiceMock.Setup(s => s.HeeftAlIngeschreven(user.Id, avond.Id)).ReturnsAsync(false);
+            _inschrijvingServiceMock.Setup(s => s.GetAvondMetDieetOptiesAsync(avond.Id)).ReturnsAsync(avond);
+            _inschrijvingServiceMock.Setup(s => s.KanDeelnemenAanAvond(user, avond.Datum)).ReturnsAsync(true); // Al ingeschreven voor een andere avond
+
+            var tempDataMock = new Mock<ITempDataDictionary>();
+            _inschrijvingController.TempData = tempDataMock.Object;
+
+            // Act
+            var result = await _inschrijvingController.Inschrijven(avond.Id) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Index", result.ActionName);
+            tempDataMock.VerifySet(tempData => tempData["ErrorMessage"] = "Je kunt slechts aan één bordspellenavond per dag deelnemen.", Times.Once);
+        }
+
+        //user story 5
     }
 }
