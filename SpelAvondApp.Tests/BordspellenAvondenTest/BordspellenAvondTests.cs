@@ -22,6 +22,7 @@ namespace SpelAvondApp.Tests.BordspellenAvondenTest
         private Mock<UserManager<ApplicationUser>> _userManagerMock;
         private BordspellenAvondController _controller;
         private InschrijvingenController _inschrijvingController;
+        private ReviewsController _reviewController;
         private ApplicationUser _user;
 
         [TestInitialize]
@@ -38,6 +39,7 @@ namespace SpelAvondApp.Tests.BordspellenAvondenTest
 
             _controller = new BordspellenAvondController(_avondServiceMock.Object, _userManagerMock.Object, _inschrijvingServiceMock.Object);
             _inschrijvingController = new InschrijvingenController(_inschrijvingServiceMock.Object, _userManagerMock.Object);
+            _reviewController = new ReviewsController(_avondServiceMock.Object, _userManagerMock.Object);
         }
 
         private Mock<UserManager<ApplicationUser>> MockUserManager()
@@ -382,7 +384,7 @@ namespace SpelAvondApp.Tests.BordspellenAvondenTest
         public async Task Volwassene_Speler_Kan_Deelnemen_Aan_18Plus_Avond()
         {
             // Arrange
-            var user = new ApplicationUser { Id = "user2", UserName = "testadult", Geboortedatum = new DateTime(1990, 1, 1) }; // Volwassen
+            var user = new ApplicationUser { Id = "user2", UserName = "testadult", Geboortedatum = new DateTime(1990, 1, 1) }; 
             var avond = new BordspellenAvond
             {
                 Id = 2,
@@ -561,5 +563,315 @@ namespace SpelAvondApp.Tests.BordspellenAvondenTest
         }
 
         //user story 5
+
+        [TestMethod]
+        public async Task Bordspellen_Zichtbaar_Op_Index()
+        {
+            // Arrange
+            var userId = "user1";
+            var allAvonden = new List<BordspellenAvond>
+    {
+        new BordspellenAvond
+        {
+            Id = 1,
+            OrganisatorId = userId,
+            Bordspellen = new List<Bordspel>
+            {
+                new Bordspel { Id = 1, Naam = "Catan", Genre = Genre.Strategisch, Is18Plus = false },
+                new Bordspel { Id = 2, Naam = "Risk", Genre = Genre.Actie, Is18Plus = false }
+            }
+        }
+    };
+
+            _avondServiceMock.Setup(s => s.GetAllAvondenAsync()).ReturnsAsync(allAvonden);
+
+            // Act
+            var result = await _controller.Index() as ViewResult;
+            var model = result?.Model as List<BordspellenAvond>;
+
+            // Assert
+            Assert.IsNotNull(model);
+            Assert.AreEqual(1, model.Count);
+            Assert.AreEqual(2, model[0].Bordspellen.Count);
+            Assert.IsTrue(model[0].Bordspellen.Any(b => b.Naam == "Catan"));
+            Assert.IsTrue(model[0].Bordspellen.Any(b => b.Naam == "Risk"));
+        }
+        [TestMethod]
+        public async Task Index_Geeft_Lege_Lijst_Als_Er_Geen_Avonden_Zijn()
+        {
+            // Arrange
+            _avondServiceMock.Setup(s => s.GetAllAvondenAsync()).ReturnsAsync(new List<BordspellenAvond>());
+
+            // Act
+            var result = await _controller.Index() as ViewResult;
+            var model = result?.Model as List<BordspellenAvond>;
+
+            // Assert
+            Assert.IsNotNull(model);
+            Assert.AreEqual(0, model.Count, "Expected no avonden to be available.");
+        }
+        //foutscenario
+        [TestMethod]
+        public async Task Index_Geeft_Avond_Zonder_Bordspellen_Correct_Weer()
+        {
+            // Arrange
+            var allAvonden = new List<BordspellenAvond>
+    {
+        new BordspellenAvond
+        {
+            Id = 1,
+            OrganisatorId = "user1",
+            Bordspellen = new List<Bordspel>() // Geen bordspellen
+        }
+    };
+
+            _avondServiceMock.Setup(s => s.GetAllAvondenAsync()).ReturnsAsync(allAvonden);
+
+            var result = await _controller.Index() as ViewResult;
+            var model = result?.Model as List<BordspellenAvond>;
+
+            Assert.IsNotNull(model);
+            Assert.AreEqual(1, model.Count);
+            Assert.AreEqual(0, model[0].Bordspellen.Count, "Expected avond to have no bordspellen.");
+        }
+        [TestMethod]
+        public async Task Index_Toont_Avond_Met_18Plus_En_Niet18Plus_Bordspellen()
+        {
+            // Arrange
+            var allAvonden = new List<BordspellenAvond>
+    {
+        new BordspellenAvond
+        {
+            Id = 1,
+            OrganisatorId = "user1",
+            Bordspellen = new List<Bordspel>
+            {
+                new Bordspel { Id = 1, Naam = "Cards Against Humanity", Genre = Genre.Strategisch, Is18Plus = true },
+                new Bordspel { Id = 2, Naam = "Catan", Genre = Genre.Strategisch, Is18Plus = false }
+            }
+        }
+    };
+
+            _avondServiceMock.Setup(s => s.GetAllAvondenAsync()).ReturnsAsync(allAvonden);
+
+            // Act
+            var result = await _controller.Index() as ViewResult;
+            var model = result?.Model as List<BordspellenAvond>;
+
+            // Assert
+            Assert.IsNotNull(model);
+            Assert.AreEqual(1, model.Count);
+            Assert.AreEqual(2, model[0].Bordspellen.Count);
+            Assert.IsTrue(model[0].Bordspellen.Any(b => b.Naam == "Cards Against Humanity" && b.Is18Plus));
+            Assert.IsTrue(model[0].Bordspellen.Any(b => b.Naam == "Catan" && !b.Is18Plus));
+        }
+
+        //user story 6
+        [TestMethod]
+        public async Task Index_Toont_EtenEnDrinkenOpties_Voor_BordspellenAvond()
+        {
+            // Arrange
+            var allAvonden = new List<BordspellenAvond>
+    {
+        new BordspellenAvond
+        {
+            Id = 1,
+            BiedtLactosevrijeOpties = true,
+            BiedtNotenvrijeOpties = false,
+            BiedtVegetarischeOpties = true,
+            BiedtAlcoholvrijeOpties = true
+        }
+    };
+
+            _avondServiceMock.Setup(s => s.GetAllAvondenAsync()).ReturnsAsync(allAvonden);
+
+            // Act
+            var result = await _controller.Index() as ViewResult;
+            var model = result?.Model as List<BordspellenAvond>;
+
+            // Assert
+            Assert.IsNotNull(model);
+            Assert.AreEqual(1, model.Count);
+            Assert.IsTrue(model[0].BiedtLactosevrijeOpties, "Expected lactose-free options to be available.");
+            Assert.IsFalse(model[0].BiedtNotenvrijeOpties, "Expected no nut-free options.");
+            Assert.IsTrue(model[0].BiedtVegetarischeOpties, "Expected vegetarian options to be available.");
+            Assert.IsTrue(model[0].BiedtAlcoholvrijeOpties, "Expected alcohol-free options to be available.");
+        }
+        [TestMethod]
+        public async Task Inschrijven_Toont_Waarschuwing_Bij_Onverenigbare_Dieetwensen()
+        {
+            // Arrange
+            var user = new ApplicationUser
+            {
+                Id = "user1",
+                HeeftLactoseAllergie = true,
+                HeeftNotenAllergie = true,
+                IsVegetarisch = false,
+                GeenAlcohol = false
+            };
+
+            var avond = new BordspellenAvond
+            {
+                Id = 1,
+                BiedtLactosevrijeOpties = false,
+                BiedtNotenvrijeOpties = false,
+                BiedtVegetarischeOpties = true,
+                BiedtAlcoholvrijeOpties = true
+            };
+
+            _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(user);
+            _inschrijvingServiceMock.Setup(s => s.GetAvondMetDieetOptiesAsync(avond.Id)).ReturnsAsync(avond);
+            _inschrijvingServiceMock.Setup(s => s.HeeftAlIngeschreven(user.Id, avond.Id)).ReturnsAsync(false);
+            _inschrijvingServiceMock.Setup(s => s.KanDeelnemenAanAvond(user, avond.Datum)).ReturnsAsync(false);
+            _inschrijvingServiceMock.Setup(s => s.MagDeelnemenOpBasisVanLeeftijdAsync(user.Id, avond.Id)).ReturnsAsync(true);
+
+            var tempDataMock = new Mock<ITempDataDictionary>();
+            _inschrijvingController.TempData = tempDataMock.Object;
+
+            // Act
+            var result = await _inschrijvingController.Inschrijven(avond.Id) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Index", result.ActionName);
+            tempDataMock.VerifySet(tempData => tempData["ErrorMessage"] = "Let op: De bordspellenavond voldoet mogelijk niet aan jouw dieetwensen of allergieën.", Times.Once);
+        }
+        [TestMethod]
+        public async Task Inschrijven_Toont_Geen_Waarschuwing_Bij_Matchende_Dieetwensen()
+        {
+            // Arrange
+            var user = new ApplicationUser
+            {
+                Id = "user1",
+                HeeftLactoseAllergie = true,  
+                HeeftNotenAllergie = false,
+                IsVegetarisch = false,
+                GeenAlcohol = false
+            };
+
+            var avond = new BordspellenAvond
+            {
+                Id = 1,
+                BiedtLactosevrijeOpties = true,  
+                BiedtNotenvrijeOpties = true,
+                BiedtVegetarischeOpties = true,
+                BiedtAlcoholvrijeOpties = true
+            };
+
+            _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(user);
+            _inschrijvingServiceMock.Setup(s => s.GetAvondMetDieetOptiesAsync(avond.Id)).ReturnsAsync(avond);
+            _inschrijvingServiceMock.Setup(s => s.HeeftAlIngeschreven(user.Id, avond.Id)).ReturnsAsync(false);
+            _inschrijvingServiceMock.Setup(s => s.KanDeelnemenAanAvond(user, avond.Datum)).ReturnsAsync(false);
+            _inschrijvingServiceMock.Setup(s => s.MagDeelnemenOpBasisVanLeeftijdAsync(user.Id, avond.Id)).ReturnsAsync(true);
+            _inschrijvingServiceMock.Setup(s => s.InschrijvenVoorAvondAsync(user.Id, avond.Id, It.IsAny<string>())).ReturnsAsync(true);
+
+            var tempDataMock = new Mock<ITempDataDictionary>();
+            _inschrijvingController.TempData = tempDataMock.Object;
+
+            // Act
+            var result = await _inschrijvingController.Inschrijven(avond.Id) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Index", result.ActionName);
+
+            tempDataMock.VerifySet(tempData => tempData["SuccessMessage"] = "Je bent succesvol ingeschreven voor de bordspellenavond!", Times.Once);
+        }
+
+        //user story 8
+
+        [TestMethod]
+        public async Task CreateReview_Succesvol_Toegevoegd()
+        {
+            // Arrange
+            var user = new ApplicationUser
+            {
+                Id = "user1",
+                UserName = "testuser"
+            };
+
+            var review = new Review
+            {
+                BordspellenAvondId = 1,
+                Score = 5,
+                Opmerking = "Geweldige avond gehad!"
+            };
+
+            _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(user);
+            _avondServiceMock.Setup(s => s.AddReviewAsync(review)).Returns(Task.CompletedTask);
+
+            // Act
+            var result = await _reviewController.Create(review) as RedirectToActionResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("MijnIngeschrevenAvonden", result.ActionName);
+            _avondServiceMock.Verify(s => s.AddReviewAsync(It.IsAny<Review>()), Times.Once);
+        }
+        [TestMethod]
+        public async Task OrganisatorReviews_Tonen_MetGemiddeldeScore()
+        {
+            // Arrange
+            var organisator = new ApplicationUser
+            {
+                Id = "org1",
+                UserName = "OrganisatorTest"
+            };
+
+            var reviews = new List<Review>
+    {
+        new Review { Score = 4, Opmerking = "Leuke avond!", SpelerId = "speler1" },
+        new Review { Score = 5, Opmerking = "Perfect georganiseerd!", SpelerId = "speler2" }
+    };
+
+            _userManagerMock.Setup(um => um.FindByIdAsync(organisator.Id)).ReturnsAsync(organisator);
+            _avondServiceMock.Setup(s => s.GetReviewsByOrganisatorAsync(organisator.Id)).ReturnsAsync(reviews);
+
+            // Act
+            var result = await _reviewController.OrganisatorReviews(organisator.Id) as ViewResult;
+            var model = result?.Model as List<Review>;
+            var viewBag = result?.ViewData["OrganisatorNaam"];
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("OrganisatorTest", viewBag);
+            Assert.IsNotNull(model);
+            Assert.AreEqual(2, model.Count);
+
+            var gemiddeldeScore = model.Average(r => r.Score);
+            Assert.AreEqual(4.5, gemiddeldeScore);
+        }
+
+        //foutscenario
+        [TestMethod]
+        public async Task CreateReview_Fout_GebruikerNietIngelogd()
+        {
+            // Arrange
+            _userManagerMock.Setup(um => um.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync((ApplicationUser)null);
+            var review = new Review { BordspellenAvondId = 1, Score = 4, Opmerking = "Niet slecht" };
+
+            // Act
+            var result = await _reviewController.Create(review) as BadRequestObjectResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Gebruiker niet gevonden.", result.Value);
+            _avondServiceMock.Verify(s => s.AddReviewAsync(It.IsAny<Review>()), Times.Never);
+        }
+        [TestMethod]
+        public async Task OrganisatorReviews_Fout_OrganisatorNietGevonden()
+        {
+            // Arrange
+            var organisatorId = "nonExistingOrg";
+            _userManagerMock.Setup(um => um.FindByIdAsync(organisatorId)).ReturnsAsync((ApplicationUser)null);
+
+            // Act
+            var result = await _reviewController.OrganisatorReviews(organisatorId) as NotFoundObjectResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Organisator niet gevonden.", result.Value);
+            _avondServiceMock.Verify(s => s.GetReviewsByOrganisatorAsync(It.IsAny<string>()), Times.Never);
+        }
     }
 }
