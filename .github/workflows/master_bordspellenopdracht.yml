@@ -22,7 +22,7 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: Run Tests
-        run: dotnet test --no-restore --verbosity normal    
+        run: dotnet test --no-restore --verbosity minimal
 
       - name: dotnet publish SpelAvondApp
         run: dotnet publish SpelAvondApp/SpelAvondApp.csproj -c Release -o ./myapp
