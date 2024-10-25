@@ -18,7 +18,6 @@ public class SpellenRepository : ISpellenRepository
         _userManager = userManager;
     }
 
-    // Bordspel Methods
     public async Task AddBordspelAsync(Bordspel bordspel)
     {
         await _context.Bordspellen.AddAsync(bordspel);
@@ -41,7 +40,7 @@ public class SpellenRepository : ISpellenRepository
         }
     }
 
-    public async Task<Bordspel> GetBordspelByIdAsync(int id)
+    public async Task<Bordspel?> GetBordspelByIdAsync(int id)
     {
         return await _context.Bordspellen.FindAsync(id);
     }
@@ -56,7 +55,6 @@ public class SpellenRepository : ISpellenRepository
         return await _context.Bordspellen.Where(b => ids.Contains(b.Id)).ToListAsync();
     }
 
-    // BordspellenAvond Methods
     public async Task AddBordspellenAvondAsync(BordspellenAvond avond)
     {
         await _context.BordspellenAvonden.AddAsync(avond);
@@ -71,7 +69,6 @@ public class SpellenRepository : ISpellenRepository
 
         if (bestaandeAvond != null)
         {
-            // Update de eigenschappen van de avond
             bestaandeAvond.Datum = avond.Datum;
             bestaandeAvond.Adres = avond.Adres;
             bestaandeAvond.MaxAantalSpelers = avond.MaxAantalSpelers;
@@ -82,7 +79,6 @@ public class SpellenRepository : ISpellenRepository
             bestaandeAvond.BiedtVegetarischeOpties = avond.BiedtVegetarischeOpties;
             bestaandeAvond.BiedtAlcoholvrijeOpties = avond.BiedtAlcoholvrijeOpties;
 
-            // Update bordspellen voor de avond
             bestaandeAvond.Bordspellen.Clear();
             var nieuweBordspellen = await GetBordspellenByIdsAsync(avond.Bordspellen.Select(b => b.Id).ToList());
             foreach (var bordspel in nieuweBordspellen)
@@ -104,16 +100,16 @@ public class SpellenRepository : ISpellenRepository
         }
     }
 
-    public async Task<BordspellenAvond> GetBordspellenAvondByIdAsync(int id)
+    public async Task<BordspellenAvond?> GetBordspellenAvondByIdAsync(int id)
     {
         return await _context.BordspellenAvonden
             .AsNoTracking()
-            .Include(b => b.Bordspellen) // Include de lijst van bordspellen
+            .Include(b => b.Bordspellen) 
             .Include(a => a.Inschrijvingen)
             .FirstOrDefaultAsync(a => a.Id == id);
     }
 
-    public async Task<List<BordspellenAvond>> GetAllBordspellenAvondenAsync()
+    public async Task<List<BordspellenAvond?>> GetAllBordspellenAvondenAsync()
     {
         var avonden = await _context.BordspellenAvonden
             .Include(b => b.Bordspellen)
@@ -143,7 +139,7 @@ public class SpellenRepository : ISpellenRepository
         _context.Inschrijvingen.Add(inschrijving);
         await _context.SaveChangesAsync();
     }
-    public async Task<Inschrijving> GetInschrijvingAsync(string userId, int avondId)
+    public async Task<Inschrijving?> GetInschrijvingAsync(string userId, int avondId)
     {
         return await _context.Inschrijvingen
             .FirstOrDefaultAsync(i => i.SpelerId == userId && i.BordspellenAvondId == avondId);
@@ -183,10 +179,10 @@ public class SpellenRepository : ISpellenRepository
             .ToListAsync();
     }
 
-    public async Task<BordspellenAvond> GetAvondMetDieetOptiesAsync(int avondId)
+    public async Task<BordspellenAvond?> GetAvondMetDieetOptiesAsync(int avondId)
     {
         return await _context.BordspellenAvonden
-            .AsNoTracking() // Optioneel, omdat we alleen lezen
+            .AsNoTracking()
             .Where(avond => avond.Id == avondId)
             .Select(avond => new BordspellenAvond
             {
@@ -197,7 +193,6 @@ public class SpellenRepository : ISpellenRepository
                 Is18Plus = avond.Is18Plus,
                 OrganisatorId = avond.OrganisatorId,
 
-                // Voegt dieetopties toe
                 BiedtLactosevrijeOpties = avond.BiedtLactosevrijeOpties,
                 BiedtNotenvrijeOpties = avond.BiedtNotenvrijeOpties,
                 BiedtVegetarischeOpties = avond.BiedtVegetarischeOpties,
@@ -243,6 +238,4 @@ public class SpellenRepository : ISpellenRepository
             await _context.SaveChangesAsync();
         }
     }
-
-
 }
