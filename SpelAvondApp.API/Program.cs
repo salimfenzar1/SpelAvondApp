@@ -136,16 +136,15 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// Configure Swagger and GraphQL
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || Environment.GetEnvironmentVariable("ENABLE_SWAGGER") == "true")
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
 app.UseRouting();
-app.UseAuthentication(); // Add Authentication Middleware
-app.UseAuthorization(); // Add Authorization Middleware
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapGraphQL("/api/graphql");
 
