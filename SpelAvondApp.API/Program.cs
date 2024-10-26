@@ -17,27 +17,16 @@ var builder = WebApplication.CreateBuilder(args);
 // Load configurations
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.api.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.api.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
     .AddEnvironmentVariables();
 
-// Check if the application is in development or production
-var isDevelopment = builder.Environment.IsDevelopment();
-
 // Configure connection strings
-var identityConnectionString = isDevelopment
-    ? builder.Configuration.GetConnectionString("DefaultConnection")
-    : Environment.GetEnvironmentVariable("IDENTITY_CONNSTR");
+var identityConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-if (identityConnectionString == null)
-    throw new InvalidOperationException("Connection string 'IDENTITY_CONNSTR' not found.");
-
-var spellenDbConnectionString = isDevelopment
-    ? builder.Configuration.GetConnectionString("SpellenDbConnection")
-    : Environment.GetEnvironmentVariable("SPELLEN_CONNSTR");
-
-if (spellenDbConnectionString == null)
-    throw new InvalidOperationException("Connection string 'SPELLEN_CONNSTR' not found.");
+var spellenDbConnectionString = builder.Configuration.GetConnectionString("SpellenDbConnection")
+    ?? throw new InvalidOperationException("Connection string 'SpellenDbConnection' not found.");
 
 // Configure the Identity database with ApplicationDbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -52,10 +41,10 @@ builder.Services.AddDefaultIdentity<ApplicationUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-
-string jwtIssuer = isDevelopment ? builder.Configuration["Jwt:Issuer"] : Environment.GetEnvironmentVariable("JWT_ISSUER");
-string jwtAudience = isDevelopment ? builder.Configuration["Jwt:Audience"] : Environment.GetEnvironmentVariable("JWT_AUDIENCE");
-string jwtKey = isDevelopment ? builder.Configuration["Jwt:Key"] : Environment.GetEnvironmentVariable("JWT_KEY");
+// Load JWT settings directly from appsettings.json
+string jwtIssuer = builder.Configuration["Jwt:Issuer"];
+string jwtAudience = builder.Configuration["Jwt:Audience"];
+string jwtKey = builder.Configuration["Jwt:Key"];
 
 if (string.IsNullOrEmpty(jwtIssuer) || string.IsNullOrEmpty(jwtAudience) || string.IsNullOrEmpty(jwtKey))
 {
