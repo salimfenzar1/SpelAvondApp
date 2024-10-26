@@ -16,7 +16,6 @@
   <ItemGroup>
     <ProjectReference Include="..\SpelAvondApp.Application\SpelAvondApp.Application.csproj" />
     <ProjectReference Include="..\SpelAvondApp.Domain\SpelAvondApp.Domain.csproj" />
-    <ProjectReference Include="..\SpelAvondenApp.Domain\SpelAvondApp.Domain.csproj" />
   </ItemGroup>
 
 </Project>

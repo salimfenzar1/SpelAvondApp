@@ -74,10 +74,15 @@ namespace SpelAvondApp.Api.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            if (!await _bordspellenAvondService.IsUserEligibleToOrganizeAsync(user))
+            if (user != null)
             {
-                return BadRequest("Je moet minimaal 18 jaar oud zijn om een bordspellenavond te organiseren.");
+                if (!await _bordspellenAvondService.IsUserEligibleToOrganizeAsync(user))
+                {
+                    return BadRequest("Je moet minimaal 18 jaar oud zijn om een bordspellenavond te organiseren.");
+                }
             }
+
+            
 
             var bordspellenAvond = new BordspellenAvond
             {

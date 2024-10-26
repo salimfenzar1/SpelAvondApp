@@ -47,7 +47,13 @@ builder.Services.AddScoped<IBordspelService, BordspelService>();
 builder.Services.AddScoped<ISpellenRepository, SpellenRepository>();
 builder.Services.AddScoped<IBordspellenAvondService, BordspellenAvondService>();
 builder.Services.AddScoped<IInschrijvingService, InschrijvingService>();
-
+ builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    });
+});
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllersWithViews();
@@ -68,7 +74,7 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
+app.UseCors("AllowAll");
 app.UseRouting();
 
 app.UseAuthentication(); 

@@ -3,7 +3,7 @@ using SpelAvondApp.Domain.Models;
 
 public class QueryType
 {
-    public async Task<List<BordspellenAvond>> GetBordspellenAvonden([Service] ISpellenRepository repository)
+    public async Task<List<BordspellenAvond?>> GetBordspellenAvonden([Service] ISpellenRepository repository)
     {
         return await repository.GetAllBordspellenAvondenAsync();
     }
