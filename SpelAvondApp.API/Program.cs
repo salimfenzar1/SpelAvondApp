@@ -17,16 +17,24 @@ var builder = WebApplication.CreateBuilder(args);
 // Load configurations
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddJsonFile("appsettings.api.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.api.{builder.Environment.EnvironmentName}.json", optional: true)
     .AddEnvironmentVariables();
 
-// Configure connection strings
-var identityConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+// Configure connection strings with environment variables for production
+var identityConnectionString = builder.Environment.IsDevelopment()
+    ? builder.Configuration.GetConnectionString("DefaultConnection")
+    : Environment.GetEnvironmentVariable("IDENTITY_CONNSTR");
 
-var spellenDbConnectionString = builder.Configuration.GetConnectionString("SpellenDbConnection")
-    ?? throw new InvalidOperationException("Connection string 'SpellenDbConnection' not found.");
+if (identityConnectionString == null)
+    throw new InvalidOperationException("Connection string 'IDENTITY_CONNSTR' not found.");
+
+var spellenDbConnectionString = builder.Environment.IsDevelopment()
+    ? builder.Configuration.GetConnectionString("SpellenDbConnection")
+    : Environment.GetEnvironmentVariable("SPELLEN_CONNSTR");
+
+if (spellenDbConnectionString == null)
+    throw new InvalidOperationException("Connection string 'SPELLEN_CONNSTR' not found.");
 
 // Configure the Identity database with ApplicationDbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
