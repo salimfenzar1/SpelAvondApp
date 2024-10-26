@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 # Temporary log files or locked files
 DumpStack.log.tmp
+/NDependOut
