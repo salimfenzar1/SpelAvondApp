@@ -21,54 +21,92 @@ namespace SpelAvondApp.API.Controllers
 
         // GET: api/Bordspel
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Bordspel>>> GetAllBordspellen()
+        [HttpGet]
+        public async Task<ActionResult<List<BordspelDto>>> GetAllBordspellen()
         {
             var bordspellen = await _bordspelService.GetAllBordspellenAsync();
-            return Ok(bordspellen);
+            var bordspellenDto = bordspellen.Select(b => new BordspelDto
+            {
+                Id = b.Id,
+                Naam = b.Naam,
+                Beschrijving = b.Beschrijving,
+                Genre = b.Genre.ToString(),
+                Is18Plus = b.Is18Plus,
+                SoortSpel = b.SoortSpel.ToString(),
+                FotoPath = b.FotoPath
+            }).ToList();
+
+            return Ok(bordspellenDto);
         }
+
 
         // GET: api/Bordspel/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Bordspel>> GetBordspel(int id)
+        public async Task<ActionResult<BordspelDto>> GetBordspelById(int id)
         {
             var bordspel = await _bordspelService.GetBordspelByIdAsync(id);
-
             if (bordspel == null)
             {
-                return NotFound();
+                return NotFound("Bordspel niet gevonden.");
             }
 
-            return Ok(bordspel);
-        }
-
-        // POST: api/Bordspel
-        [HttpPost]
-        public async Task<ActionResult> CreateBordspel(Bordspel bordspel)
-        {
-            await _bordspelService.AddBordspelAsync(bordspel);
-            return CreatedAtAction(nameof(GetBordspel), new { id = bordspel.Id }, bordspel);
-        }
-
-        // PUT: api/Bordspel/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBordspel(int id, Bordspel bordspel)
-        {
-            if (id != bordspel.Id)
+            var bordspelDto = new BordspelDto
             {
-                return BadRequest("De ID's komen niet overeen.");
-            }
+                Id = bordspel.Id,
+                Naam = bordspel.Naam,
+                Beschrijving = bordspel.Beschrijving,
+                Genre = bordspel.Genre.ToString(),
+                Is18Plus = bordspel.Is18Plus,
+                SoortSpel = bordspel.SoortSpel.ToString(),
+                FotoPath = bordspel.FotoPath
+            };
 
+            return Ok(bordspelDto);
+        }
+
+
+        [HttpPost]
+        public async Task<ActionResult> CreateBordspel([FromBody] CreateBordspelDto model)
+        {
+            var bordspel = new Bordspel
+            {
+                Naam = model.Naam,
+                Beschrijving = model.Beschrijving,
+                Genre = model.Genre,
+                Is18Plus = model.Is18Plus,
+                SoortSpel = model.SoortSpel,
+                FotoPath = model.FotoPath
+            };
+
+            await _bordspelService.AddBordspelAsync(bordspel);
+            return CreatedAtAction(nameof(GetBordspelById), new { id = bordspel.Id }, new
+            {
+                Message = "Bordspel succesvol aangemaakt.",
+                Bordspel = bordspel
+            });
+        }
+
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateBordspel(int id, [FromBody] CreateBordspelDto model)
+        {
             var existingBordspel = await _bordspelService.GetBordspelByIdAsync(id);
             if (existingBordspel == null)
             {
-                return NotFound();
+                return NotFound("Bordspel niet gevonden.");
             }
 
-            await _bordspelService.UpdateBordspelAsync(bordspel);
-            return NoContent();
+            existingBordspel.Naam = model.Naam;
+            existingBordspel.Beschrijving = model.Beschrijving;
+            existingBordspel.Genre = model.Genre;
+            existingBordspel.Is18Plus = model.Is18Plus;
+            existingBordspel.SoortSpel = model.SoortSpel;
+            existingBordspel.FotoPath = model.FotoPath;
+
+            await _bordspelService.UpdateBordspelAsync(existingBordspel);
+            return Ok(new { Message = "Bordspel succesvol bijgewerkt." });
         }
 
-        // DELETE: api/Bordspel/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBordspel(int id)
         {

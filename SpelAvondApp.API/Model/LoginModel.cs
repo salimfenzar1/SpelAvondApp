@@ -1,5 +1,13 @@
-﻿public class LoginModel
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SpelAvondApp.API.Models
 {
-    public string Username { get; set; }
-    public string Password { get; set; }
+    public class LoginModel
+    {
+        [Required]
+        public required string Username { get; set; }
+
+        [Required]
+        public required string Password { get; set; }
+    }
 }
