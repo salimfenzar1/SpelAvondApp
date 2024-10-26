@@ -105,6 +105,7 @@ public class SpellenRepository : ISpellenRepository
         return await _context.BordspellenAvonden
             .AsNoTracking()
             .Include(b => b.Bordspellen) 
+            .Include(b => b.Reviews)
             .Include(a => a.Inschrijvingen)
             .FirstOrDefaultAsync(a => a.Id == id);
     }
