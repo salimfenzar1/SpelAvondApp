@@ -1,16 +1,20 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SpelAvondApp.Domain.Models;
 using SpelAvondApp.Infrastructure;
+using SpelAvondApp.Application;
+using System.Text;
 using Microsoft.AspNetCore.Builder;
 using HotChocolate;
 using HotChocolate.AspNetCore;
-using HotChocolate.Execution.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SpelAvondApp.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load configurations
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.api.json", optional: false, reloadOnChange: true)
@@ -49,23 +53,80 @@ builder.Services.AddDefaultIdentity<ApplicationUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+// Add JWT Authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+
+    // Voeg logging toe voor debugging
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine("Token validation failed: " + context.Exception.Message);
+            return Task.CompletedTask;
+        }
+    };
+});
 
 
 // Add UserManager and other Identity services
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
-// Add your repositories and other services
+// Add repositories and services
 builder.Services.AddScoped<ISpellenRepository, SpellenRepository>();
+builder.Services.AddScoped<IBordspelService, BordspelService>();
+builder.Services.AddScoped<IBordspellenAvondService, BordspellenAvondService>();
+builder.Services.AddScoped<IInschrijvingService, InschrijvingService>();
 
 // Add Hot Chocolate services for GraphQL
 builder.Services
     .AddGraphQLServer()
-    .AddQueryType<QueryType>(); // Add your query types here
-
+    .AddQueryType<QueryType>(); // Voeg je query types hier toe
 
 // Add Swagger/OpenAPI for the REST API
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Please enter JWT with Bearer in the field. Example: \"Bearer {token}\"",
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+         Scheme = "Bearer",
+        BearerFormat = "JWT" 
+    });
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] { }
+        }
+    });
+});
 
 var app = builder.Build();
 
@@ -77,12 +138,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
-
+app.UseAuthentication(); // Add Authentication Middleware
+app.UseAuthorization(); // Add Authorization Middleware
 
 app.MapGraphQL("/api/graphql");
 
 app.UseHttpsRedirection();
-app.UseAuthorization();
-
 app.MapControllers();
 app.Run();

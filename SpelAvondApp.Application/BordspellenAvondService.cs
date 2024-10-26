@@ -40,6 +40,8 @@ public class BordspellenAvondService : IBordspellenAvondService
         return await _repository.GetAllBordspellenAvondenAsync();
     }
 
+
+
     public async Task<List<Bordspel>> GetAllBordspellenAsync()
     {
         return await _repository.GetAllBordspellenAsync();
