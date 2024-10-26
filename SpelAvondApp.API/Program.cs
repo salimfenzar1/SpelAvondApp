@@ -24,7 +24,7 @@ builder.Configuration
 // Check if the application is in development or production
 var isDevelopment = builder.Environment.IsDevelopment();
 
-// Connection string for the Identity database
+// Configure connection strings
 var identityConnectionString = isDevelopment
     ? builder.Configuration.GetConnectionString("DefaultConnection")
     : Environment.GetEnvironmentVariable("IDENTITY_CONNSTR");
@@ -32,7 +32,6 @@ var identityConnectionString = isDevelopment
 if (identityConnectionString == null)
     throw new InvalidOperationException("Connection string 'IDENTITY_CONNSTR' not found.");
 
-// Connection string for the Spellen database
 var spellenDbConnectionString = isDevelopment
     ? builder.Configuration.GetConnectionString("SpellenDbConnection")
     : Environment.GetEnvironmentVariable("SPELLEN_CONNSTR");
@@ -53,6 +52,16 @@ builder.Services.AddDefaultIdentity<ApplicationUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+
+string jwtIssuer = isDevelopment ? builder.Configuration["Jwt:Issuer"] : Environment.GetEnvironmentVariable("JWT_ISSUER");
+string jwtAudience = isDevelopment ? builder.Configuration["Jwt:Audience"] : Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+string jwtKey = isDevelopment ? builder.Configuration["Jwt:Key"] : Environment.GetEnvironmentVariable("JWT_KEY");
+
+if (string.IsNullOrEmpty(jwtIssuer) || string.IsNullOrEmpty(jwtAudience) || string.IsNullOrEmpty(jwtKey))
+{
+    throw new InvalidOperationException("JWT configuration values are missing.");
+}
+
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
@@ -67,12 +76,10 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtAudience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
-
-    // Voeg logging toe voor debugging
     options.Events = new JwtBearerEvents
     {
         OnAuthenticationFailed = context =>
@@ -82,7 +89,6 @@ builder.Services.AddAuthentication(options =>
         }
     };
 });
-
 
 // Add UserManager and other Identity services
 builder.Services.AddScoped<UserManager<ApplicationUser>>();
@@ -110,8 +116,8 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Please enter JWT with Bearer in the field. Example: \"Bearer {token}\"",
         Name = "Authorization",
         Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
-         Scheme = "Bearer",
-        BearerFormat = "JWT" 
+        Scheme = "Bearer",
+        BearerFormat = "JWT"
     });
     options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement {
         {
