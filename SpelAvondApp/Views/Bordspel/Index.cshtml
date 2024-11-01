@@ -7,7 +7,7 @@
 <h1 class="my-4 text-center">@ViewData["Title"]</h1>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <a asp-controller="Bordspel" asp-action="CreateBordspel" class="btn btn-success">
+    <a asp-controller="Bordspel" asp-action="CreateBordspel" class="btn btn-orange">
         <i class="bi bi-plus-circle"></i> Bordspel Aanmaken
     </a>
 </div>
@@ -54,7 +54,7 @@
                 </td>
                 <td class="text-center">
                     <div class="d-flex gap-1 justify-content-center">
-                        <a asp-controller="Bordspel" asp-action="EditBordspel" asp-route-id="@bordspel.Id" class="btn btn-primary btn-sm">
+                        <a asp-controller="Bordspel" asp-action="EditBordspel" asp-route-id="@bordspel.Id" class="btn btn-primary btn-sm btn-orange">
                             <i class="bi bi-pencil-square"></i> Bewerken
                         </a>
                         <a asp-controller="Bordspel" asp-action="DeleteBordspel" asp-route-id="@bordspel.Id" class="btn btn-danger btn-sm">

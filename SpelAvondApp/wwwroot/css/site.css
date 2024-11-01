@@ -20,3 +20,21 @@ html {
 body {
   margin-bottom: 60px;
 }
+a {
+    color: #FFA500;
+}
+h1 {
+    color: #133B5C !important;
+}
+h5 {
+    color: #133B5C !important; 
+}
+.btn-orange {
+    background-color: #FFA500!important;
+    color:black !important;
+}
+.alert-tab {
+    background-color: #FFA500 !important;
+    color: black !important;
+    border: 1px solid black;
+}

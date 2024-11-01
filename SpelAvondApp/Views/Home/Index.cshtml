@@ -9,29 +9,28 @@
     <h1 class="display-4">Welkom bij SpelAvondApp!</h1>
     <p class="lead">Organiseer of neem deel aan de leukste bordspellenavonden met je vrienden!</p>
 
-    <hr class="my-4" />
 
     @if (SignInManager.IsSignedIn(User))
     {
         <div class="row mt-4">
             <div class="col-md-6">
-                <div class="card shadow">
+                <div class="card">
                     <img src="~/images/boardgames.jpg" class="card-img-top" alt="Bordspellen" />
-                    <div class="card-body">
+                    <div style="background-color:#A3CFF0" class="card-body">
                         <h5 class="card-title">Bekijk Bordspellen</h5>
                         <p class="card-text">Ontdek alle beschikbare bordspellen die je kunt spelen tijdens een bordspellenavond. Klik hieronder om de lijst te bekijken en je favorieten te kiezen!</p>
-                        <a href="/Bordspel/Index" class="btn btn-primary">Bordspellen Lijst</a>
+                        <a style="background-color:#FFA500; color:black !important;" href="/Bordspel/Index" class="btn btn-primary">Bordspellen Lijst</a>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-6">
-                <div class="card shadow">
+                <div class="card ">
                     <img src="~/images/gamenight.jpeg" class="card-img-top" alt="Bordspellenavonden" />
-                    <div class="card-body">
+                    <div style="background-color:#A3CFF0" class="card-body">
                         <h5 class="card-title">Bekijk Bordspellenavonden</h5>
                         <p class="card-text">Wil je een gezellige avond plannen met je vrienden of deelnemen aan een bestaande avond? Klik hier om alle geplande avonden te bekijken!</p>
-                        <a href="/BordspellenAvond/Index" class="btn btn-primary">Bordspellenavonden Lijst</a>
+                        <a style="background-color:#FFA500; color:black !important;" href="/BordspellenAvond/Index" class="btn btn-primary">Bordspellenavonden Lijst</a>
                     </div>
                 </div>
             </div>
@@ -40,17 +39,17 @@
     else
     {
         <!-- Als de gebruiker niet is ingelogd, toon een bericht -->
-        <div class="alert alert-warning" role="alert">
+        <div class="alert alert-tab" role="alert">
             <h4 class="alert-heading">Let op!</h4>
             <p>Je moet ingelogd zijn om toegang te krijgen tot de lijst van bordspellen en bordspellenavonden.</p>
             <hr>
-            <p class="mb-0">Klik <a href="/Identity/Account/Login" class="alert-link">hier</a> om in te loggen of <a href="/Identity/Account/Register" class="alert-link">hier</a> om een account aan te maken.</p>
+            <p class="mb-0">Klik <a href="/Identity/Account/Login" style="color:#1F4E79" class="alert-link">hier</a> om in te loggen of <a href="/Identity/Account/Register" style="color:#1F4E79" class="alert-link">hier</a> om een account aan te maken.</p>
         </div>
     }
 
-    <div class="row mt-5">
+    <div  class="row mt-5">
         <div class="col-md-12">
-            <div class="alert alert-info" role="alert">
+            <div style="background-color: #1F4E79; color:#FFA500" class="alert" role="alert">
                 <strong>Tip:</strong> Wil je zelf een bordspellenavond organiseren? Log in en maak een nieuwe avond aan!
             </div>
         </div>

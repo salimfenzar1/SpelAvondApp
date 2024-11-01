@@ -12,7 +12,7 @@
 <h1 class="my-4 text-center">@ViewData["Title"]</h1>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <a asp-controller="BordspellenAvond" asp-action="Create" class="btn btn-success">
+    <a asp-controller="BordspellenAvond" asp-action="Create" class="btn btn-orange">
         <i class="bi bi-plus-circle"></i> Bordspel Avond Aanmaken
     </a>
 </div>
@@ -53,7 +53,7 @@
                 <td>@avond.Adres</td>
                 <td>
                     @avond.Organisator?.UserName
-                    <a asp-controller="Reviews" asp-action="OrganisatorReviews" asp-route-organisatorId="@avond.OrganisatorId" class="btn btn-info btn-sm">
+                    <a asp-controller="Reviews" asp-action="OrganisatorReviews" asp-route-organisatorId="@avond.OrganisatorId" class="btn btn-orange btn-sm">
                         Bekijk alle reviews
                     </a>
                 </td>
@@ -115,7 +115,7 @@
                     @if (avond.OrganisatorId == currentUserId)
                     {
                         <div class="d-flex gap-2 justify-content-center">
-                            <a asp-controller="BordspellenAvond" asp-action="Edit" asp-route-id="@avond.Id" class="btn btn-primary btn-sm">
+                            <a asp-controller="BordspellenAvond" asp-action="Edit" asp-route-id="@avond.Id" class="btn btn-orange btn-sm">
                                 <i class="bi bi-pencil-square"></i> Bewerken
                             </a>
                             <a asp-controller="BordspellenAvond" asp-action="Delete" asp-route-id="@avond.Id" class="btn btn-danger btn-sm">
@@ -125,7 +125,7 @@
                     }
                     else
                     {
-                        <a asp-controller="Inschrijvingen" asp-action="Inschrijven" asp-route-avondId="@avond.Id" class="btn btn-success btn-sm">
+                        <a asp-controller="Inschrijvingen" asp-action="Inschrijven" asp-route-avondId="@avond.Id" class="btn btn-orange btn-sm">
                             <i class="bi bi-check-circle"></i> Inschrijven
                         </a>
                     }
